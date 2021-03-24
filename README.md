@@ -55,3 +55,6 @@ Space traders is a backend to a trading game in space. The front end was intenti
 - [x] Add error checking for each call
 - [ ] Test each error step
 - [ ] Add a loop to go back and forth to each planet
+
+## Repo needs
+- [ ] Description of how the folder structure works
