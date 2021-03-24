@@ -17,12 +17,12 @@ Space traders is a backend to a trading game in space. The front end was intenti
 
 # Todo:
 ## Testing in the API
-- [ ] flightplans
-    - [ ] getFlightPlansInSystem
-    - [ ] getFlightPlanById
+- [x] flightplans
+    - [x] getFlightPlansInSystem
+    - [x] getFlightPlanById
     - [x] submitNewFlightPlan
-- [ ] game
-    - [ ] getGameStatus
+- [x] game
+    - [x] getGameStatus
 - [ ] loans
     - [ ] getAvailableLoans
     - [ ] getCurrentLoans
@@ -32,8 +32,8 @@ Space traders is a backend to a trading game in space. The front end was intenti
     - [ ] getLocationInfo
     - [ ] getDockedShipsInfo
     - [ ] getLocationsInSystem
-- [ ] marketplace
-    - [ ] getMarketInfo
+- [x] marketplace
+    - [x] getMarketInfo
 - [x] purchase orders
     - [x] placePurchaseOrder
 - [x] sell orders
@@ -45,12 +45,13 @@ Space traders is a backend to a trading game in space. The front end was intenti
     - [ ] getPlayersShips
     - [ ] jettisonCargo
     - [ ] scrapShip
-- [ ] systems
-    - [ ] getSystemInfo
+- [x] systems
+    - [x] getSystemInfo
 - [x] users
     - [x] createNewUser
     - [x] getUserInfo
 
 ## Index changes
 - [x] Add error checking for each call
+- [ ] Test each error step
 - [ ] Add a loop to go back and forth to each planet

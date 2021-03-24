@@ -5,7 +5,7 @@ const calls = require('./apiCalls.js');
  * Get request for https://api.spacetraders.io/game/systems/:symbol/flight-plans
  * @param {String} token Token associated with the players username
  * @param {String} symbol Symbol of the system you want to get flight plans for
- * @returns List of flight plan objects
+ * @returns List of all flight plan objects, including other players ship
  */
 async function getFlightPlansInSystem(token, symbol){
     const flightPlans = await calls.getApiData(

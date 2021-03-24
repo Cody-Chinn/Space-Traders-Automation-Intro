@@ -4,9 +4,10 @@ const purchaseOrder = require('./Api/purchaseOrders.js');
 const sellOrders = require('./Api/sellOrders.js');
 const ships = require('./Api/ships.js');
 const users = require('./Api/users.js');
+const market = require('./Api/marketplace.js');
 
 async function startScript(){
-    
+
     // Each call made to the api has a flow of index.js -> Api/{endpoint}.js -> apiCall.js
     // This is to cut down on the amount of copy/pasted code in each file so each file used 
     // in the index will need to be required at the top in order to use the functions
@@ -123,6 +124,13 @@ async function startScript(){
 // over step our 2 call per second limit
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+let testInfo = {
+    playername: 'TestSpaceScorpion21', 
+    token: '3317adf1-d73b-4c6c-ac4c-307b60f25574',
+    shipId: 'ckmmsyeen29450915s6lnnmyxtk',
+    location: 'OE-PM'
 }
 
 startScript();
