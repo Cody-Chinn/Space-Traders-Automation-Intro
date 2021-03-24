@@ -15,7 +15,7 @@ Space traders is a backend to a trading game in space. The front end was intenti
  - Once all of the packages are installed, run ```npm start```
  - That's it! All of the important data should now be outputting to the terminal 😃
 
-#Todo:
+# Todo:
 ## Testing in the API
 - [ ] flightplans
     - [ ] getFlightPlansInSystem
