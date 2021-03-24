@@ -24,7 +24,7 @@ Space traders is a backend to a trading game in space. The front end was intenti
 ## Repo needs
 - [ ] Description of how the folder structure works
 
-## Testing in the API
+## Testing in the API - Each function has been tested and works as intended
 - [x] flightplans
     - [x] getFlightPlansInSystem
     - [x] getFlightPlanById
