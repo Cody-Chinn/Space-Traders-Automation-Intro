@@ -56,14 +56,21 @@ async function postApiData(endpoint, token, bodyObject){
  * @returns raw data from the API
  */
 async function putApiData(endpoint, token, bodyObject){
-    const res = await fetch(baseUrl + endpoint, {
+    const fetchObj = {
         method: 'PUT',
         headers: { 
             'Content-Type': 'application/json', 
             'Authorization': `Bearer ${token}` 
         },
-        body: JSON.stringify(bodyObject)
-    });
+    }
+
+    // Puts cannot have a body object set to null or the server
+    // errors so only add the body key if the bodyObject was passed
+    if(bodyObject != null){
+        fetchObj.body = JSON.stringify(bodyObject);
+    }
+
+    const res = await fetch(baseUrl + endpoint, fetchObj);
     
     const data = await res.json();
     return data;

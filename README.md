@@ -23,10 +23,10 @@ Space traders is a backend to a trading game in space. The front end was intenti
     - [x] submitNewFlightPlan
 - [x] game
     - [x] getGameStatus
-- [ ] loans
-    - [ ] getAvailableLoans
-    - [ ] getCurrentLoans
-    - [ ] payoffLoan
+- [x] loans
+    - [x] getAvailableLoans
+    - [x] getCurrentLoans
+    - [x] payoffLoan
     - [x] requestNewLoan
 - [ ] locations
     - [ ] getLocationInfo

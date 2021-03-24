@@ -36,6 +36,8 @@ async function getCurrentLoans(name, token){
  * @returns User object containing all data for the user
  */
 async function payoffLoan(name, token, loanId){
+    // Make sure to pass null for the bodyObject on
+    // a put to make srue the server doesn't crash
     const loan = await calls.putApiData(
         `users/${name}/loans/${loanId}`, 
         token, 
