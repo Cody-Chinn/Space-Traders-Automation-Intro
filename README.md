@@ -16,6 +16,14 @@ Space traders is a backend to a trading game in space. The front end was intenti
  - That's it! All of the important data should now be outputting to the terminal 😃
 
 # Todo:
+## Index changes
+- [x] Add error checking for each call
+- [ ] Test each error step
+- [ ] Add a loop to go back and forth to each planet
+
+## Repo needs
+- [ ] Description of how the folder structure works
+
 ## Testing in the API
 - [x] flightplans
     - [x] getFlightPlansInSystem
@@ -28,33 +36,25 @@ Space traders is a backend to a trading game in space. The front end was intenti
     - [x] getCurrentLoans
     - [x] payoffLoan
     - [x] requestNewLoan
-- [ ] locations
-    - [ ] getLocationInfo
-    - [ ] getDockedShipsInfo
-    - [ ] getLocationsInSystem
+- [x] locations
+    - [x] getLocationInfo
+    - [x] getDockedShipsInfo
+    - [x] getLocationsInSystem
 - [x] marketplace
     - [x] getMarketInfo
 - [x] purchase orders
     - [x] placePurchaseOrder
 - [x] sell orders
     - [x] sellGoods
-- [ ] ships
+- [x] ships
     - [x] buyShip
-    - [ ] getAvailableShips
-    - [ ] getShipInfoById
-    - [ ] getPlayersShips
-    - [ ] jettisonCargo
-    - [ ] scrapShip
+    - [x] getAvailableShips
+    - [x] getShipInfoById
+    - [x] getPlayersShips
+    - [x] jettisonCargo
+    - [x] scrapShip
 - [x] systems
     - [x] getSystemInfo
 - [x] users
     - [x] createNewUser
     - [x] getUserInfo
-
-## Index changes
-- [x] Add error checking for each call
-- [ ] Test each error step
-- [ ] Add a loop to go back and forth to each planet
-
-## Repo needs
-- [ ] Description of how the folder structure works

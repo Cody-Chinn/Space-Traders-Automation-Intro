@@ -47,7 +47,6 @@ async function postApiData(endpoint, token, bodyObject){
     return data;
 }
 
-// TODO: Needs testing
 /**
  * Creates and formats a PUT request to the space traders API
  * @param {String} endpoint 

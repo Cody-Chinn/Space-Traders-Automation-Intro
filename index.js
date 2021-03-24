@@ -5,11 +5,13 @@ const sellOrders = require('./Api/sellOrders.js');
 const ships = require('./Api/ships.js');
 const users = require('./Api/users.js');
 const market = require('./Api/marketplace.js');
+const location = require('./Api/locations');
 
 async function startScript(){
 
-    let loan = await loans.payoffLoan('TestSpaceScorpion21','3317adf1-d73b-4c6c-ac4c-307b60f25574', 'ckmmsvzj427710315s66743c724');
-    console.log(loan)
+    // const ship = await ships.getShipInfoById('TestSpaceScorpion21', '3317adf1-d73b-4c6c-ac4c-307b60f25574', 'ckmmsyeen29450915s6lnnmyxtk');
+    const ship = await ships.scrapShip('TestSpaceScorpion21', '3317adf1-d73b-4c6c-ac4c-307b60f25574', 'ckmmsyeen29450915s6lnnmyxtk');
+    console.log(ship);
 
     // // Each call made to the api has a flow of index.js -> Api/{endpoint}.js -> apiCall.js
     // // This is to cut down on the amount of copy/pasted code in each file so each file used 
