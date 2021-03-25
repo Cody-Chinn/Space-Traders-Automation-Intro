@@ -12,7 +12,7 @@ async function startScript(){
     // Each call made to the api has a flow of index.js -> Api/{endpoint}.js -> apiCall.js
     // This is to cut down on the amount of copy/pasted code in each file so each file used 
     // in the index will need to be required at the top in order to use the functions
-    const userTest = await users.createNewUser('TestSpaceScorpion22');
+    const userTest = await users.createNewUser('TestSpaceScorpion24');
 
     // Lets get make sure the username isn't taken first and display an error message if 
     // there was one present on the returned json. These checks are placed throughout the
@@ -37,7 +37,7 @@ async function startScript(){
         return;
     }
     
-    console.log(`Loan recieved, taking 1.5 second nap`);
+    //console.log(`Loan recieved, taking 1.5 second nap`);
 
     // The api has a 2 call per second limit so we need to sleep long enough
     // to be to make calls again. You'll see more of these throughout the script
@@ -72,7 +72,7 @@ async function startScript(){
         console.log(metalOrder.error.message);
         return;
     }
-
+    console.log('Bought some Metal, time to sell it somewhere else for profit.');
     // Send the ship to the nearest planet (in this case OE-PM since we're on OE-PM-TR)
     // To get more info on locations you can use the functions in the locations file 
     const flightplan = await flightPlans.submitNewFlightPlan(userTest.user.username, userTest.token, meNewShipId, 'OE-PM');
@@ -94,7 +94,7 @@ async function startScript(){
         console.log(sellOrder.error.message);
         return;
     }
-    
+    console.log('Metal sold! Now lets do it again!');
     // As a nice feature, there's an output of anything that could be considered useful
     // to the person running the script. None of the lines below are part of the automation
     // process but do increase quality of life for the user
