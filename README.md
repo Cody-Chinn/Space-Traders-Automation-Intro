@@ -29,10 +29,12 @@ I've added comments throughout to help even the newest of programmers try to ana
 ## Index changes
 - [x] Add error checking for each call
 - [x] Test each error step
-- [ ] Add a loop to go back and forth to each planet
+- [x] Add a loop to go back and forth to each planet
+- [x] Make the username a prompt rather than a script edit
 
 ## Repo needs
 - [x] Description of how the folder structure works
+- [ ] ENUM for Material keys
 
 ## Testing in the API - Each function has been tested and works as intended
 - [x] flightplans
