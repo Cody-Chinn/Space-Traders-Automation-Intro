@@ -12,7 +12,7 @@ Space traders is a backend to a trading game in space. The front end was intenti
  - Make sure you have [Node JS](https://nodejs.org/en/download/) installed and then run ```npm install``` from your cmd line or terminal
     - tip for VS Code users: the keybind commands ``` control + ` ``` to open the terminal
  - Once all of the packages are installed, run ```npm start```
- - That's it! All of the important data should now be outputting to the terminal 😃
+ - That's it! Type in a username and let the automation do it's work! 😃
 
 ## How to use the repo
 I've added comments throughout to help even the newest of programmers try to analyze how this program works but I'll start at the top.
