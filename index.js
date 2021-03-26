@@ -56,6 +56,7 @@ async function startScript(){
     }
     const meNewShipId = meNewShip.user.ships[0].id;
 
+    console.log(`Ship purchased! Here's the ID: ${meNewShip}`);
     // Purchase Fuel for the newly aquired ship
     const initialFuelOrder = await purchaseOrder.placePurchaseOrder(playerName.user.username, playerName.token, meNewShipId, 'FUEL', 20);
     if(initialFuelOrder.error){
