@@ -31,6 +31,7 @@ I've added comments throughout to help even the newest of programmers try to ana
 - [x] Test each error step
 - [x] Add a loop to go back and forth to each planet
 - [x] Make the username a prompt rather than a script edit
+- [ ] Figure out if we want a login prompt
 
 ## Repo needs
 - [x] Description of how the folder structure works

@@ -8,65 +8,75 @@ const users = require('./Api/users.js');
 
 async function startScript(){
 
-    // Each call made to the api has a flow of index.js -> Api/{endpoint}.js -> apiCall.js
-    // This is to cut down on the amount of copy/pasted code in each file so each file used 
-    // in the index will need to be required at the top in order to use the functions (ie users.createNewUser below)
-    const playerNamePrompt = prompt('Welcome Space Cadet! What\'s your callsign? ');
-    const playerName = await users.createNewUser(playerNamePrompt);
+    // // Each call made to the api has a flow of index.js -> Api/{endpoint}.js -> apiCall.js
+    // // This is to cut down on the amount of copy/pasted code in each file so each file used 
+    // // in the index will need to be required at the top in order to use the functions (ie users.createNewUser below)
+    // const playerNamePrompt = prompt('Welcome Space Cadet! What\'s your callsign? ');
+    // const playerName = await users.createNewUser(playerNamePrompt);
 
-    // Lets get make sure the username isn't taken first and display an error message if 
-    // there was one present on the returned json. These checks are placed throughout the
-    // loop to make sure each call works as expected
-    if(playerName.error){
-        console.log('\nERROR CREATING USER: ');
-        console.log('---------------------');
-        console.log(playerName.error.message);
-        return;
-    }
+    // // Lets get make sure the username isn't taken first and display an error message if 
+    // // there was one present on the returned json. These checks are placed throughout the
+    // // loop to make sure each call works as expected
+    // if(playerName.error){
+    //     console.log('\nERROR CREATING USER: ');
+    //     console.log('---------------------');
+    //     console.log(playerName.error.message);
+    //     return;
+    // }
 
 
 
-    // Kickoff the automation and notify the user of their token
-    console.log(`\n\nHello ${playerName.user.username}, beginning your automation now!`);
-    console.log(`You'll want to save this token. It's pretty important --> ${playerName.token}`);
+    // // Kickoff the automation and notify the user of their token
+    // console.log(`\n\nHello ${playerName.user.username}, beginning your automation now!`);
+    // console.log(`You'll want to save this token. It's pretty important --> ${playerName.token}`);
     
-    // Take out a loan so we can purchase a ship
-    const loan = await loans.requestNewLoan(playerName.user.username, playerName.token, 'STARTUP');
-    if(loan.error){
-        console.log('\nERROR TAKING OUT LOAN: ');
-        console.log('-----------------------');
-        console.log(loan.error.message);
-        return;
-    }
+    // // Take out a loan so we can purchase a ship
+    // const loan = await loans.requestNewLoan(playerName.user.username, playerName.token, 'STARTUP');
+    // if(loan.error){
+    //     console.log('\nERROR TAKING OUT LOAN: ');
+    //     console.log('-----------------------');
+    //     console.log(loan.error.message);
+    //     return;
+    // }
 
-    console.log(`Loan received! Here's the ID: ${loan.user.loans[0].id}. You'll need that to pay it back.`)
-    // The api has a 2 call per second limit so we need to sleep long enough
-    // to be to make calls again. You'll see more of these throughout the script
-    await sleep(1500);
+    // console.log(`Loan received! Here's the ID: ${loan.user.loans[0].id}. You'll need that to pay it back.`)
+    // // The api has a 2 call per second limit so we need to sleep long enough
+    // // to be to make calls again. You'll see more of these throughout the script
+    // await sleep(1500);
 
 
     
-    // Buy a ship and grab the Id for future functions
-    const meNewShip = await ships.buyShip(playerName.user.username, playerName.token, 'OE-PM-TR', 'JW-MK-I');
-    if(meNewShip.error){
-        console.log('\nERROR BUYING SHIP: ');
-        console.log('-------------------');
-        console.log(meNewShip.error.message);
-        return;
-    }
-    const meNewShipId = meNewShip.user.ships[0].id;
+    // // Buy a ship and grab the Id for future functions
+    // const meNewShip = await ships.buyShip(playerName.user.username, playerName.token, 'OE-PM-TR', 'JW-MK-I');
+    // if(meNewShip.error){
+    //     console.log('\nERROR BUYING SHIP: ');
+    //     console.log('-------------------');
+    //     console.log(meNewShip.error.message);
+    //     return;
+    // }
+    // const meNewShipId = meNewShip.user.ships[0].id;
 
-    console.log(`Ship purchased! Here's the ID: ${meNewShip}`);
-    // Purchase Fuel for the newly aquired ship
-    const initialFuelOrder = await purchaseOrder.placePurchaseOrder(playerName.user.username, playerName.token, meNewShipId, 'FUEL', 20);
-    if(initialFuelOrder.error){
-        console.log('\nERROR BUYING FUEL: ');
-        console.log('-------------------');
-        console.log(initialFuelOrder.error.message);
-        return;
+    // console.log(`Ship purchased! Here's the ID: ${meNewShip}`);
+    // // Purchase Fuel for the newly aquired ship
+    // const initialFuelOrder = await purchaseOrder.placePurchaseOrder(playerName.user.username, playerName.token, meNewShipId, 'FUEL', 20);
+    // if(initialFuelOrder.error){
+    //     console.log('\nERROR BUYING FUEL: ');
+    //     console.log('-------------------');
+    //     console.log(initialFuelOrder.error.message);
+    //     return;
+    // }
+    // console.log(`Fueled up, lets get some cargo after a 1.5 second nap`);
+    // await sleep(1500);
+
+    const playerName = {
+        user: {
+            username: 'SpaceScorpion'
+        },
+        token: 'b2cea63f-4de5-4f17-a073-ae8ddcfeec15'
     }
-    console.log(`Fueled up, lets get some cargo after a 1.5 second nap`);
-    await sleep(1500);
+
+    const meNewShip = await ships.getPlayersShips(playerName.user.username, playerName.token);
+    const meNewShipId = meNewShip.ships[0].id;
 
     // THE LOOP
     console.log('\n\nBEGINNING AUTOMATION LOOP!');
@@ -184,7 +194,7 @@ async function startScript(){
             console.log(refuelTwo.error.message);
             return;
         }
-        console.log('Ship refueled! Time for a nap.\n\n');
+        console.log('Ship refueled! Time for a nap.\n\nStarting next iteration!');
 
         await sleep(1500);
         // RESTART THE LOOP ----------------------------------------------------------------------------------------------------------
