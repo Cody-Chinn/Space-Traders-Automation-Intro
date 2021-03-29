@@ -1,4 +1,4 @@
-const prompt = require('prompt-sync')();
+const prompt = require('prompt-sync')({sigint: true});
 const loans = require('./Api/loans.js');
 const purchaseOrder = require('./Api/purchaseOrders.js');
 const ships = require('./Api/ships.js');
@@ -13,6 +13,9 @@ async function accountCreator(){
     
     // Step 1:  Create the account with the function at the bottom of this file
     const playerData = await requestUsername();
+    if(playerData == null){
+        return null;
+    }
     // Stop the script if an error happened with the account creation
     if(playerData.error){
         console.log(playerData.error);
@@ -82,6 +85,9 @@ async function accountCreator(){
 async function requestUsername(){
     // Send the requested user callsign to the api to create an accoun
     const playerNamePrompt = prompt('Yeah you look like a newbie, let\'s get you setup! What do you want your callsign to be? ');
+    if(playerName == null){
+        return null;
+    }
     const playerName = await users.createNewUser(playerNamePrompt);
 
     // Lets get make sure the username isn't taken before we continue. If it is, just

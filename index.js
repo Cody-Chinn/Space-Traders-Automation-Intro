@@ -1,5 +1,6 @@
-const prompt = require('prompt-sync')();
+const prompt = require('prompt-sync')({sigint: true});
 const newAccount = require('./newAccount.js');
+const existingAccount = require('./existingAccount.js');
 const loop = require('./theLoop.js');
 
 /*******************************************************************************
@@ -9,15 +10,24 @@ const loop = require('./theLoop.js');
 async function startScript(){
 
     let playerInfo;
-
+    console.log(`Thanks for checking out my script! I worked pretty hard on it so any feedback is helpful :) you can use Control + C to stop the script at any time.\n\n`);
+    const newPlayer = await newPlayerPrompt();
     // Very first thing, ask the player if they are new
-    if(newPlayerPrompt()){
+    if(newPlayer){
         // The player is new, lets run the account creator from the newAccount.js file
         playerInfo = await newAccount.accountCreator();
+        if(playerInfo == null){
+            console.log(`Exiting Automation`);
+            return;
+        }
         loop.theLoop(playerInfo.username, playerInfo.token, playerInfo.shipId);
     } else {
-        console.log(`Unfortunately running loops for existing users hasn't been setup yet but it is on the TODO list!`);
-        return;
+        playerInfo = await existingAccount.retrievePlayerData();
+        if(playerInfo.shipId == null){
+            console.log(`Exiting Automation`);
+            return;
+        }
+        // loop.theLoop(playerInfo.username, playerInfo.token, playerInfo.shipId);
     }
 }
 

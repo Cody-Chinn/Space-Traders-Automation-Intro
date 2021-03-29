@@ -15,7 +15,6 @@
   "author": "Cody Chinn",
   "license": "ISC",
   "dependencies": {
-    "dotenv": "^8.2.0",
     "node-fetch": "^2.6.1",
     "prompt-sync": "^4.2.0"
   }
