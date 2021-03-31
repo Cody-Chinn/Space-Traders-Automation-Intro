@@ -1,6 +1,7 @@
 const prompt = require('prompt-sync')({sigint: true});
 const users = require('./Api/users.js');
 const ships = require('./Api/ships.js');
+const loans = require('./Api/loans.js')
 const flightPlans = require('./Api/flightPlans.js');
 const locations = require('./Api/locations.js')
 
@@ -9,8 +10,7 @@ const locations = require('./Api/locations.js')
  */
 async function retrievePlayerData(){
     const playerInfo = await login();
-
-    const shipId = await selectShip(playerInfo.user.ships);
+    const shipId = await selectShip(playerInfo);
 
     const shipInfo = await ships.getShipInfoById(playerInfo.user.username, playerInfo.token, shipId);
 
@@ -56,11 +56,25 @@ async function retrievePlayerData(){
  * 
  * @param {List<String>} shipList the list of ships the player currently owns
  ****************************************************************************/
-async function selectShip(shipList){
+async function selectShip(playerInfo){
+    console.log(playerInfo)
+    const shipList = playerInfo.user.ships;
+
     if(shipList.length == 0){
-        console.log(`No ships found. You'll need to buy one.`);
+        console.log(`No ships found. Let's get you in brand new hot rod.`);
+        const shipId = await tryBuyShip(playerInfo);
+        return shipId;
     } else if(shipList.length == 1){
-        return shipList[0].id;
+        console.log(`You only have one ship located at ${shipList[0].location}`);
+        const permissionToFly = prompt('Is it ok to use this ship for automation?(Y/N) ');
+        if(permissionToFly == 'y' || permissionToFly == 'Y' ||
+            permissionToFly == 'yes' || permissionToFly == 'Yes'){
+            return shipList[0].id;
+        } else {
+            const newShipId = await tryBuyShip(playerInfo);
+            return newShipId;
+             
+        }
     } else {
         console.log(`Looks like we have some options so we'll leave that up to you.`);
         console.log(`We've found ${shipList.length} ships in your fleet and need to know which one you want to send to OE-PM-TR to start the automation loop.`);
@@ -129,5 +143,44 @@ async function getShipFuelAmount(shipData){
         }
     });
     return 0;
+}
+
+async function tryBuyShip(playerInfo){
+    // check playerinfo.user.loans for a length of 0, take out a loan if it is a length of 0
+    // if it's not and the user already has a loan, check the credits against the cost of a Jackshaw
+    // and ask the player if they can buy one. return the new ship id or null if they don't want to buy one
+    const availableShips = await ships.getAvailableShips(playerInfo.token);
+    let shipPrice;
+    availableShips.ships.forEach(ship => {
+        if(ship.type == "JW-MK-I"){
+            shipPrice = ship.purchaseLocations[0].price;
+        }
+    });
+
+    if(playerInfo.user.loans.length == 0 && playerInfo.user.credits < shipPrice){
+        console.log(`You can't afford a ship and you don't currently have loans. Let's get a loan taken out for you!`);
+        const loan = await loans.requestNewLoan(playerInfo.user.username, playerInfo.token, 'STARTUP');
+        if(loan.error){
+            console.log('\nERROR TAKING OUT LOAN FOR EXISTING USER: ');
+            console.log('-------------------------------------------');
+            throw new Error(loan.error.message);
+        }
+        console.log(`Loan received! Here's the ID, you'll need that to pay it back --> ${loan.user.loans[0].id}`);
+    } else if(playerInfo.user.credits < shipPrice){
+        console.log(`Looks like you're a little short on cash. Unfortunately we can't start the trade loop without a ship on the moon.`);
+        console.log(`You'll either need to make enough to buy another ship, or create a new account to start using the loop`);
+        console.log(`Credits: ${playerInfo.user.credits}\nShip Price: ${shipPrice}`);
+        throw new Error(`You'll either need to make enough to buy another ship, or create a new account to start using the loop. Exiting script`);
+    }
+
+    const newShip = await ships.buyShip(playerInfo.user.username, playerInfo.token, 'OE-PM-TR', "JW-MK-I");
+    if(newShip.error){
+        console.log('ERROR PURCHASING SHIP FOR EXISTING USER');
+        console.log('---------------------------------------');
+        throw new Error(newShipId.error);
+    }
+    console.log(`Just bought a shiny new Jackshaw on the moon! We'll use this bad boy to start making big bucks!`)
+    return newShip.user.ships[0].id;
+
 }
 exports.retrievePlayerData = retrievePlayerData;

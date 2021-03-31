@@ -18,6 +18,9 @@ const materialTypes = require('./Api/materialTypes.js');
  * @returns {null} If any errors are found, the loop prints the error and stops
  */
 async function theLoop(username, token, shipId){
+
+    const delayTimer = 1000;
+
     console.log('\n\nBEGINNING AUTOMATION LOOP!');
     while(1){
         // STEP ONE ----- BUY METAL AND FLY TO TRITUS -------------------------------------------------------------------------------
@@ -28,8 +31,7 @@ async function theLoop(username, token, shipId){
         if(metalOrder.error){
             console.log('\nERROR BUYING METAL: ');
             console.log('--------------------');
-            console.log(metalOrder.error.message);
-            return;
+            throw new Error(metalOrder.error.message);
         }
         console.log(`Bought some Metal for ${metalBuyPrice} credits, let\'s go sell it on Prime for profit!`);
         // Send the ship to the nearest planet (in this case OE-PM since we're on OE-PM-TR)
@@ -38,27 +40,30 @@ async function theLoop(username, token, shipId){
         if(tritusToPrime.error){
             console.log('\nERROR FLYING FROM TRITUS TO PRIME: ');
             console.log('-----------------------------------');
-            console.log(tritusToPrime.error.message);
-            return;
+            throw new Error(tritusToPrime.error.message);
         }
+        // It's better to grab the flight time of a flight plan and then multiply by 1000
+        // to convert from milliseconds. This makes the script less vulnerable to flight
+        // time changes on updates from the SpaceTraders API.
+        const tritusToPrimeFlighTime = tritusToPrime.flightPlan.timeRemainingInSeconds;
 
         console.log(`Ship has liftoff, waiting 90 seconds until touchdown`);
 
-        await sleep(90000);
+        await sleep(tritusToPrimeFlighTime*1000);
         // --------------------------------------------------------------------------------------------------------------------------
 
 
 
         // STEP TWO ----- SELL METAL AND REFUEL -------------------------------------------------------------------------------------
         // Sell all of the METAL material on your ship for profit
-        const sellMetals = await sellOrders.sellGoods(username, token, shipId, materialTypes.types.METALS, 80);
-        const sellMetalsPrice = sellMetals.order.total;
+        const sellMetals = await sellOrders.sellGoods(username, token, shipId, materialTypes.types.METALS, 80);  
         if(sellMetals.error){
             console.log('\nERROR SELLING METAL: ');
             console.log('---------------------');
-            console.log(sellMetals.error.message);
-            return;
+            throw new Error(sellMetals.error.message);
         }
+
+        const sellMetalsPrice = sellMetals.order.total;
         console.log(`Metal sold for ${sellMetalsPrice} credits!`);
         if(sellMetalsPrice - metalBuyPrice > 0){
             console.log(`That's a profit of ${sellMetalsPrice-metalBuyPrice} credits!`);
@@ -71,12 +76,11 @@ async function theLoop(username, token, shipId){
         if(refuelOne.error){
             console.log('\nERROR BUYING FUEL: ');
             console.log('-------------------');
-            console.log(refuelOne.error.message);
-            return;
+            throw new Error(refuelOne.error.message);
         }
         console.log('Ship refueled! Time for a nap.');
 
-        await sleep(1500);
+        await sleep(delayTimer);
         // --------------------------------------------------------------------------------------------------------------------------
 
 
@@ -88,8 +92,7 @@ async function theLoop(username, token, shipId){
         if(workerOrder.error){
             console.log('\nERROR BUYING WORKERS: ');
             console.log('----------------------');
-            console.log(workerOrder.error.message);
-            return;
+            throw new Error(workerOrder.error.message);
         }
         console.log(`Bought some Workers for ${workerBuyPrice} credits, time to sell them on the moon!`);
         
@@ -99,12 +102,14 @@ async function theLoop(username, token, shipId){
         if(primeToTritus.error){
             console.log('\nERROR FLYING FROM PRIME TO TRITUS: ');
             console.log('-----------------------------------');
-            console.log(primeToTritus.error.message);
-            return;
+            throw new Error(primeToTritus.error.message);
         }
+        // Still need to make sure we using retrieved flight times, not hardcoded numbers
+        const primteToTritusFlightTime = primeToTritus.flightPlan.timeRemainingInSeconds;
+
         console.log(`Ship has liftoff, waiting 90 seconds until touchdown`);
 
-        await sleep(90000);
+        await sleep(primteToTritusFlightTime*1000);
         // --------------------------------------------------------------------------------------------------------------------------
 
 
@@ -116,8 +121,7 @@ async function theLoop(username, token, shipId){
         if(sellWorkers.error){
             console.log('\nERROR SELLING WORKERS: ');
             console.log('---------------------');
-            console.log(sellOrder.error.message);
-            return;
+            throw new Error(sellOrder.error.message);
         }
         console.log(`Workers sold for ${workerSellPrice} credits!`);
         if(workerSellPrice-workerBuyPrice > 0){
@@ -131,12 +135,11 @@ async function theLoop(username, token, shipId){
         if(refuelTwo.error){
             console.log('\nERROR BUYING FUEL: ');
             console.log('-------------------');
-            console.log(refuelTwo.error.message);
-            return;
+            throw new Error(refuelTwo.error.message);
         }
         console.log('Ship refueled! Time for a nap.\n\nStarting next iteration!');
 
-        await sleep(1500);
+        await sleep(delayTimer);
         // RESTART THE LOOP ----------------------------------------------------------------------------------------------------------
     }
 }

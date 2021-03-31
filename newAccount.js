@@ -37,7 +37,7 @@ async function accountCreator(){
         return;
     }
 
-    console.log(`Loan received! Here's the ID, you'll need that to pay it back. --> ${loan.user.loans[0].id}`)
+    console.log(`Loan received! Here's the ID, you'll need that to pay it back --> ${loan.user.loans[0].id}`)
     await sleep(1500);
 
 
@@ -85,7 +85,7 @@ async function accountCreator(){
 async function requestUsername(){
     // Send the requested user callsign to the api to create an accoun
     const playerNamePrompt = prompt('Yeah you look like a newbie, let\'s get you setup! What do you want your callsign to be? ');
-    if(playerName == null){
+    if(playerNamePrompt == null){
         return null;
     }
     const playerName = await users.createNewUser(playerNamePrompt);

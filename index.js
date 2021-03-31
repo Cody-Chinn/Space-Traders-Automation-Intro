@@ -27,6 +27,8 @@ async function startScript(){
             console.log(`Exiting Automation`);
             return;
         }
+        console.log(`Ending start script for existing player`);
+        console.log(playerInfo);
         // loop.theLoop(playerInfo.username, playerInfo.token, playerInfo.shipId);
     }
 }

@@ -26,7 +26,7 @@ I've added comments throughout to help even the newest of programmers try to ana
     - To really optimize a loop, try to run each function to get a feel for the platform and how to play the game.
 
 # Todo:
-## Index changes
+## Start Script changes
 - [x] Add error checking for each call
 - [x] Test each error step
 - [x] Add a loop to go back and forth to each planet
@@ -34,10 +34,15 @@ I've added comments throughout to help even the newest of programmers try to ana
 - [x] Create script to determine if user is new
 - [x] Create start script for new user
 - [ ] Create alternative start script for existing user
+    - [x] User without ships
+    - [x] User with single ship
+    - [ ] User with multiple ships
 
 ## Repo needs
 - [ ] Description of how the folder structure works
 - [ ] Sleep function needs a home
+- [ ] Better comments in existing user script
+- [ ] Break up repeating functionalities?
 - [x] ENUM for Material keys
 
 ## Testing in the API - Each function has been tested and works as intended
