@@ -33,16 +33,16 @@ I've added comments throughout to help even the newest of programmers try to ana
 - [x] Make the username a prompt rather than a script edit
 - [x] Create script to determine if user is new
 - [x] Create start script for new user
-- [ ] Create alternative start script for existing user
+- [x] Create alternative start script for existing user
     - [x] User without ships
     - [x] User with single ship
-    - [ ] User with multiple ships
+    - [x] User with multiple ships
 
 ## Repo needs
 - [ ] Description of how the folder structure works
 - [ ] Sleep function needs a home
 - [ ] Better comments in existing user script
-- [ ] Break up repeating functionalities?
+- [x] Break up repeating functionalities?
 - [x] ENUM for Material keys
 
 ## Testing in the API - Each function has been tested and works as intended
