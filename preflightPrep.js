@@ -1,4 +1,3 @@
-const locationNames = require('./Api/locationNames.js');
 const locations = require('./Api/locations.js');
 const materials = require('./Api/materialTypes.js');
 const flights = require('./Api/flightPlans.js');

@@ -3,7 +3,7 @@
  * This makes typos less frequent and enables autocomplete 
  * for any materials you may be looking for
  */
-const types = {
+const materials = {
     CHEMICALS: 'CHEMICALS',
     CONSTRUCTION_MATERIALS: 'CONSTRUCTION_MATERIALS',
     CONSUMER_GOODS: 'CONSUMER_GOODS',
@@ -20,4 +20,4 @@ const types = {
     WORKERS: 'WORKERS',
 }
 
-exports.types = types;
+exports.materials = materials;

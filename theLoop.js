@@ -2,10 +2,10 @@ const ships = require('./Api/ships');
 const flightPlans = require('./Api/flightPlans.js');
 const purchaseOrder = require('./Api/purchaseOrders.js');
 const sellOrders = require('./Api/sellOrders.js');
-const materialTypes = require('./Api/materialTypes.js');
 const prep = require('./preflightPrep');
 const help = require('./helpers.js');
-const { systems } = require('./Api/locationNames.js');
+const {systems} = require('./Api/locationNames.js');
+const {materials} = require('./Api/materialTypes.js');
 
 /**
  * The meat and potatoes function. All editing should be done here to optimize credit flow.
@@ -47,8 +47,8 @@ async function theLoop(username, token, shipId){
     // The two materials to be bought and sold in the loop
     // Material One will be bought on the first planet and sold on the second
     // Material Two will be bought on the second planet and sold on the first
-    const materialOne = materialTypes.types.METALS;
-    const materialTwo = materialTypes.types.WORKERS;
+    const materialOne = materials.METALS;
+    const materialTwo = materials.WORKERS;
 
     await help.sleep(delayTimer);
 
@@ -112,7 +112,7 @@ async function theLoop(username, token, shipId){
         }
 
         // Need to buy fuel at every planet to make sure we don't run out
-        const refuelOne = await purchaseOrder.placePurchaseOrder(username, token, shipId, materialTypes.types.FUEL, 2);
+        const refuelOne = await purchaseOrder.placePurchaseOrder(username, token, shipId, materials.FUEL, 2);
         if(refuelOne.error){
             console.log('\nERROR BUYING FUEL: ');
             console.log('-------------------');
@@ -176,7 +176,7 @@ async function theLoop(username, token, shipId){
         }
 
         // Refuel again - this time we need to buy more because it takes more fuel to go from Prime to Tritus than Tritus to Prime
-        const refuelTwo = await purchaseOrder.placePurchaseOrder(username, token, shipId, materialTypes.types.FUEL, 4);
+        const refuelTwo = await purchaseOrder.placePurchaseOrder(username, token, shipId, materials.FUEL, 4);
         if(refuelTwo.error){
             console.log('\nERROR BUYING FUEL: ');
             console.log('-------------------');

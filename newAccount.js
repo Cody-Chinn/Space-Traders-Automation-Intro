@@ -3,7 +3,8 @@ const loans = require('./Api/loans.js');
 const purchaseOrder = require('./Api/purchaseOrders.js');
 const ships = require('./Api/ships.js');
 const users = require('./Api/users.js');
-const materialTypes = require('./Api/materialTypes.js');
+const {materials} = require('./Api/materialTypes.js');
+const {systems} = require('./Api/locationNames.js')
 const help = require('./helpers.js');
 
 /************************************************************************
@@ -44,7 +45,7 @@ async function accountCreator(){
 
     
     // Step 3: Buy a ship and grab the Id for future functions
-    const meNewShip = await ships.buyShip(playerData.user.username, playerData.token, 'OE-PM-TR', 'JW-MK-I');
+    const meNewShip = await ships.buyShip(playerData.user.username, playerData.token, systems.OE.PMTR, 'JW-MK-I');
     if(meNewShip.error){
         console.log('\nERROR BUYING SHIP: ');
         console.log('-------------------');
@@ -58,7 +59,7 @@ async function accountCreator(){
 
 
     // Step 4: Purchase Fuel for the newly aquired ship
-    const initialFuelOrder = await purchaseOrder.placePurchaseOrder(playerData.user.username, playerData.token, meNewShipId, materialTypes.types.FUEL, 20);
+    const initialFuelOrder = await purchaseOrder.placePurchaseOrder(playerData.user.username, playerData.token, meNewShipId, materials.FUEL, 20);
     if(initialFuelOrder.error){
         console.log('\nERROR BUYING FUEL: ');
         console.log('-------------------');

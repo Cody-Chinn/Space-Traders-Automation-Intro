@@ -7,7 +7,7 @@
 
 const preflight = require('./preflightPrep.js');
 const ships = require('./Api/ships.js');
-const mats = require('./Api/materialTypes.js');
+const {materials} = require('./Api/materialTypes.js');
 const help = require('./helpers.js');
 const { placePurchaseOrder } = require('./Api/purchaseOrders.js');
 
@@ -29,9 +29,9 @@ async function preflightCheck(){
 async function testEmptyShip(){
     const ship = await ships.getShipInfoById(username, token,'ckn0lsl406542331bs67o69p0id');
     await help.sleep(1000);
-    const buyStuff1 = await placePurchaseOrder(username, token, ship.ship.id, mats.types.METALS, 1);
+    const buyStuff1 = await placePurchaseOrder(username, token, ship.ship.id, materials.METALS, 1);
     await help.sleep(1000);
-    const buyStuff2 = await placePurchaseOrder(username, token, ship.ship.id, mats.types.FUEL, 1);
+    const buyStuff2 = await placePurchaseOrder(username, token, ship.ship.id, materials.FUEL, 1);
     if(buyStuff1.error){
         console.log(buyStuff1.error.message);
         return;
