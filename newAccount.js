@@ -4,6 +4,7 @@ const purchaseOrder = require('./Api/purchaseOrders.js');
 const ships = require('./Api/ships.js');
 const users = require('./Api/users.js');
 const materialTypes = require('./Api/materialTypes.js');
+const help = require('./helpers.js');
 
 /************************************************************************
  * Spins up an account for a brand new user
@@ -38,7 +39,7 @@ async function accountCreator(){
     }
 
     console.log(`Loan received! Here's the ID, you'll need that to pay it back --> ${loan.user.loans[0].id}`)
-    await sleep(1500);
+    await help.sleep(1500);
 
 
     
@@ -65,7 +66,7 @@ async function accountCreator(){
         return;
     }
     console.log(`The ship is fueled up and ready to go! Let's start looping!`);
-    await sleep(1500); 
+    await help.sleep(1500); 
 
     // Put all of the relavent data into it's own object and go back to the start script
     let loopData = {
@@ -98,15 +99,6 @@ async function requestUsername(){
     }
 
     return playerName;
-}
-
-/**
- * Pause the script for a number of milliseconds (seconds * 1000)
- * @param {Number} ms The time in milliseconds we want the script to pause for
- * @returns {Promise} returning a promise allows us to pause using the await keyword
- */
- function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 exports.accountCreator = accountCreator;

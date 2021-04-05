@@ -5,6 +5,7 @@ const flights = require('./Api/flightPlans.js');
 const purchase = require('./Api/purchaseOrders.js');
 const sell = require('./Api/sellOrders.js');
 const ships = require('./API/ships.js');
+const help = require('./helpers.js');
 
 const delayTimer = 1000;
 /**
@@ -18,7 +19,7 @@ const delayTimer = 1000;
  */
  async function preflightCheck(username, token, ship){
 
-    console.log('Running pre-flight checks!');
+    console.log('\n\nRunning pre-flight checks!');
     console.log('Clearing out space in the ship...');
     // 1: SELL EVERYTHING! (Or jettison it... either way the ship needs to be empty)
     if(ship.ship.cargo.length !== 0){
@@ -31,7 +32,7 @@ const delayTimer = 1000;
         console.log('Ship is already on the moon. Preflight location test: PASS');
     } else {
         const travelTime = await sendToMoon(username, token, ship);
-        await sleep(travelTime*1000);
+        await help.sleep(travelTime*1000);
         console.log('Ship is on the moon. Preflight location test: PASS');
     }  
     
@@ -56,7 +57,7 @@ const delayTimer = 1000;
             throw new Error(buyFuel.error.message);
         }
         console.log(`Bought Fuel. Preflight fuel test: PASS`);
-        await sleep(delayTimer);
+        await help.sleep(delayTimer);
     }
 
     return true;
@@ -70,7 +71,7 @@ const delayTimer = 1000;
  * @returns {Number} Flight time in seconds to the moon
  */
 async function sendToMoon(username, token, ship){
-    await sleep(delayTimer);
+    await help.sleep(delayTimer);
     const moon = await locations.getLocationInfo(token, locationNames.systems.OE.PMTR);
     const moonDistance = await calcDistance(ship.ship.x, ship.ship.y, moon.location.x, moon.location.y);
     
@@ -82,14 +83,14 @@ async function sendToMoon(username, token, ship){
         throw new Error(buyFuel.error.message);
     }
 
-    await sleep(delayTimer);
+    await help.sleep(delayTimer);
     const flyToMoon = await flights.submitNewFlightPlan(username, token, ship.ship.id, locationNames.systems.OE.PMTR);
     if(flyToMoon.error){
         console.log('Could not send the ship to the moon in preflight check :/ ');
         throw new Error(flyToMoon.error.message)
     }
     console.log(`Flying to the moon! This should take about ${flyToMoon.flightPlan.timeRemainingInSeconds} seconds`);
-    await sleep(flyToMoon.flightPlan.timeRemainingInSeconds);
+    await help.sleep(flyToMoon.flightPlan.timeRemainingInSeconds);
 
     return flyToMoon.flightPlan.timeRemainingInSeconds;
 }
@@ -117,10 +118,10 @@ async function calcDistance(xCoord1, yCoord1, xCoord2, yCoord2){
  * @param {Object} ship The ship retrieved by the getShipById endpoint
  */
 async function emptyShip(username, token, shipId){
-    await sleep(1000);
+    await help.sleep(1000);
     const shipData = await ships.getShipInfoById(username, token, shipId);
     for(let i = 0; i < shipData.ship.cargo.length; i++){
-        await sleep(1000);
+        await help.sleep(1000);
         const sold = await sell.sellGoods(username, token, shipId, shipData.ship.cargo[i].good, shipData.ship.cargo[i].quantity);
         if(sold.error){
             console.log(`There was an error selling ${shipData.ship.cargo[i].good}, so we'll just try to throw it out`);        
@@ -136,16 +137,7 @@ async function emptyShip(username, token, shipId){
             console.log(`Sold ${shipData.ship.cargo[i].good}!`);
         }
     }
-    await sleep(1000);
-}
-
-/**
- * Pause the script for a number of milliseconds (seconds * 1000)
- * @param {Number} ms The time in milliseconds we want the script to pause for
- * @returns {Promise} returning a promise allows us to pause using the await keyword
- */
- function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    await help.sleep(1000);
 }
 
 exports.preflightCheck = preflightCheck;

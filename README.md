@@ -40,7 +40,8 @@ I've added comments throughout to help even the newest of programmers try to ana
 
 ## Repo needs
 - [ ] Description of how the folder structure works
-- [ ] Sleep function needs a home
+- [ ] Multiple prompts returning null?
+- [x] Sleep function needs a home
 - [ ] Better comments in existing user script
 - [x] Break up repeating functionalities?
 - [x] ENUM for Material keys

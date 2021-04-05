@@ -7,11 +7,12 @@
 
 const preflight = require('./preflightPrep.js');
 const ships = require('./Api/ships.js');
-const mats = require('./Api/materialTypes.js')
+const mats = require('./Api/materialTypes.js');
+const help = require('./helpers.js');
 const { placePurchaseOrder } = require('./Api/purchaseOrders.js');
 
 const username = 'SpaceScorpion';
-const token = '60a782be-02f2-4716-9600-20d8a3feb254';
+const token = '424e60fb-4463-43f8-bcb1-45caac00503c';
 
 async function preflightCheck(){
     const ship = await ships.getShipInfoById(username, token,'ckmwqlurt6791031cs6nrbunn5i');
@@ -27,9 +28,9 @@ async function preflightCheck(){
 
 async function testEmptyShip(){
     const ship = await ships.getShipInfoById(username, token,'ckn0lsl406542331bs67o69p0id');
-    await sleep(1000);
+    await help.sleep(1000);
     const buyStuff1 = await placePurchaseOrder(username, token, ship.ship.id, mats.types.METALS, 1);
-    await sleep(1000);
+    await help.sleep(1000);
     const buyStuff2 = await placePurchaseOrder(username, token, ship.ship.id, mats.types.FUEL, 1);
     if(buyStuff1.error){
         console.log(buyStuff1.error.message);
@@ -39,7 +40,7 @@ async function testEmptyShip(){
         console.log(buyStuff2.error.message);
         return;
     }
-    await sleep(5000);
+    await help.sleep(5000);
     await preflight.emptyShip(username, token, ship.ship.id);
     console.log('finished emptying ship!');
 }
@@ -50,13 +51,10 @@ async function getShipList(){
     console.log('Ship List: ');
     console.log(shipList);
 }
-getShipList();
+// getShipList();
 
-/**
- * Pause the script for a number of milliseconds (seconds * 1000)
- * @param {Number} ms The time in milliseconds we want the script to pause for
- * @returns {Promise} returning a promise allows us to pause using the await keyword
- */
- function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+async function getSingleShip(){
+    const ship = await ships.getShipInfoById(username, token, 'ckn4mp5s910736221ds6cyn6jmtg');
+    console.log(ship);
 }
+getSingleShip();

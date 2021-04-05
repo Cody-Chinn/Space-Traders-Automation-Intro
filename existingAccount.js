@@ -12,7 +12,7 @@ const purchase = require('./Api/purchaseOrders.js');
  */
 async function retrievePlayerData(){
     const playerInfo = await login();
-    console.log(`That checks out, now lets decide which ship to use for the automation.`);
+    console.log(`That checks out, now lets decide which ship to use for the automation.\n\n`);
     const shipId = await selectShip(playerInfo);
     
     const loopData = {

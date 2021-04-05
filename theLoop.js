@@ -4,24 +4,31 @@ const purchaseOrder = require('./Api/purchaseOrders.js');
 const sellOrders = require('./Api/sellOrders.js');
 const materialTypes = require('./Api/materialTypes.js');
 const prep = require('./preflightPrep');
+const help = require('./helpers.js');
+
 /**
  * The meat and potatoes function. All editing should be done here to optimize credit flow.
  * This takes whatever ship you pass it and creates a 4 step pattern
  * 
- * 1.) Buy metal and fly to the Prime from Tritus
- * 2.) 90 seconds later sell the metal on Prime and refuel
- * 3.) Buy some workers and fly back to the moon
- * 4.) Sell the workers and refuel
+ * 0.) preflight checks and calculations - set materials here
+ * 1.) Buy the first material and fly to the Prime from Tritus
+ * 2.) once the ship lands sell the first material on Prime and refuel
+ * 3.) Buy some material two and fly back to the moon
+ * 4.) Sell material two and refuel
  * 
  * @param {String} username The players username
  * @param {String} token The token associated with the players username
  * @param {String} shipId The ship to start the loop with
- * @returns {null} If any errors are found, the loop prints the error and stops
+ * @returns {Error} If any errors are found, the loop prints the error and stops
  */
 async function theLoop(username, token, shipId){
+    const delayTimer = 1000;
+    await help.sleep(delayTimer);
 
     // Make sure the ship is capable of running the loop before we try to start the loop
     const loopShip = await ships.getShipInfoById(username, token, shipId);
+
+    // This section can be commented out once you start making your own loops that don't start on the moon
     const readyShip = await prep.preflightCheck(username, token, loopShip);
     if(!readyShip){
         console.log(`The ship with ID ${shipId}, failed pre flight checks. 2 things are needed to make sure the ship is ready for the loop`);
@@ -32,21 +39,35 @@ async function theLoop(username, token, shipId){
         console.log('Ship has been prepped for the loop!')
     }
 
-    const delayTimer = 1000;
+    // The two materials to be bought and sold in the loop
+    // Material One will be bought on the first planet and sold on the second
+    // Material Two will be bought on the second planet and sold on the first
+    const materialOne = materialTypes.types.METALS;
+    const materialTwo = materialTypes.types.WORKERS;
+
+    await help.sleep(delayTimer);
+
+    // We need to update the ship data since the preflight checks modified the data in loopship
+    const preppedShip = await ships.getShipInfoById(username, token, shipId);
+
+    // Calculate how much of material one and two to buy
+    const matOneSize = await help.getMaterialSize(token, 'OE-PM-TR', materialOne);
+    const matOneAmount = Math.floor(preppedShip.ship.spaceAvailable / matOneSize);
 
     console.log('\n\nBEGINNING AUTOMATION LOOP!');
     while(1){
-        // STEP ONE ----- BUY METAL AND FLY TO TRITUS -------------------------------------------------------------------------------
-        // Buy some METAL goods so we can sell it on another planet, when buying/selling in this loop try to use 
+        await help.sleep(delayTimer);
+        // STEP ONE ----- BUY FIRST MATERIAL AND FLY TO TRITUS -----------------------------------------------------------------------
+        // Buy the first material so we can sell it on another planet, when buying/selling in this loop try to use 
         // the materialTypes.js import. It makes life a lot easier by giving you the options of things to buy
-        const metalOrder = await purchaseOrder.placePurchaseOrder(username, token, shipId, materialTypes.types.METALS, 90);
-        if(metalOrder.error){
-            console.log('\nERROR BUYING METAL: ');
+        const orderMaterialOne = await purchaseOrder.placePurchaseOrder(username, token, shipId, materialOne, matOneAmount);
+        if(orderMaterialOne.error){
+            console.log(`\nERROR BUYING ${materialOne}: `);
             console.log('--------------------');
-            throw new Error(metalOrder.error.message);
+            throw new Error(orderMaterialOne.error.message);
         }
-        const metalBuyPrice = metalOrder.order.total;
-        console.log(`Bought some Metal for ${metalBuyPrice} credits, let\'s go sell it on Prime for profit!`);
+        const buyMatOnePrice = orderMaterialOne.order.total;
+        console.log(`Bought some ${materialOne} for ${buyMatOnePrice} credits, let\'s go sell it on Prime for profit!`);
         // Send the ship to the nearest planet (in this case OE-PM since we're on OE-PM-TR)
         // To get more info on locations you can use the functions in the locations file 
         const tritusToPrime = await flightPlans.submitNewFlightPlan(username, token, shipId, 'OE-PM');
@@ -62,27 +83,27 @@ async function theLoop(username, token, shipId){
 
         console.log(`Ship has liftoff, waiting ${tritusToPrimeFlighTime} seconds until touchdown`);
 
-        await sleep(tritusToPrimeFlighTime*1000);
+        await help.sleep(tritusToPrimeFlighTime*1000);
         // --------------------------------------------------------------------------------------------------------------------------
 
 
 
-        // STEP TWO ----- SELL METAL AND REFUEL -------------------------------------------------------------------------------------
-        // Sell all of the METAL material on your ship for profit
-        const sellMetals = await sellOrders.sellGoods(username, token, shipId, materialTypes.types.METALS, 90);  
-        if(sellMetals.error){
-            console.log('\nERROR SELLING METAL: ');
+        // STEP TWO ----- SELL FIRST MATERIAL AND REFUEL ----------------------------------------------------------------------------
+        // Sell all of the first material on your ship for profit
+        const sellMatOne = await sellOrders.sellGoods(username, token, shipId, materialOne, matOneAmount);  
+        if(sellMatOne.error){
+            console.log(`\nERROR SELLING ${firstMaterial}: `);
             console.log('---------------------');
-            throw new Error(sellMetals.error.message);
+            throw new Error(sellMatOne.error.message);
         }
 
-        const sellMetalsPrice = sellMetals.order.total;
-        const metalDifference = sellMetalsPrice - metalBuyPrice;
-        console.log(`Metal sold for ${sellMetalsPrice} credits!`);
-        if(metalDifference > 0){
-            console.log(`That's a profit of ${metalDifference} credits!`);
+        const sellMatOnePrice = sellMatOne.order.total;
+        const matOneDifference = sellMatOnePrice - buyMatOnePrice;
+        console.log(`${materialOne} sold for ${sellMatOnePrice} credits!`);
+        if(matOneDifference > 0){
+            console.log(`That's a profit of ${matOneDifference} credits!`);
         } else {
-            console.log(`That's a loss of ${metalDifference*-1} credits :( You may want to stop the loop to research the market`);
+            console.log(`That's a loss of ${matOneDifference*-1} credits :( You may want to stop the loop to research the market`);
         }
 
         // Need to buy fuel at every planet to make sure we don't run out
@@ -94,21 +115,25 @@ async function theLoop(username, token, shipId){
         }
         console.log('Ship refueled! Time for a nap.');
 
-        await sleep(delayTimer);
+        await help.sleep(delayTimer);
         // --------------------------------------------------------------------------------------------------------------------------
 
 
 
-        // STEP THREE ----- BUY WORKERS AND FLY BACK TO THE MOON --------------------------------------------------------------------
-        // Buy some WORKERS goods so we can sell it on another planet
-        const workerOrder = await purchaseOrder.placePurchaseOrder(username, token, shipId, materialTypes.types.WORKERS, 45);
-        if(workerOrder.error){
-            console.log('\nERROR BUYING WORKERS: ');
+        // STEP THREE ----- BUY SECOND MATERIAL AND FLY BACK TO THE MOON ------------------------------------------------------------
+        // Buy second material so we can sell it on another planet
+        const matTwoSize = await help.getMaterialSize(token, 'OE-PM', materialTwo);
+        const matTwoAmount = Math.floor(preppedShip.ship.spaceAvailable / matTwoSize);
+        await help.sleep(delayTimer);
+
+        const materialTwoOrder = await purchaseOrder.placePurchaseOrder(username, token, shipId, materialTwo, matTwoAmount);
+        if(materialTwoOrder.error){
+            console.log(`\nERROR BUYING ${materialTwo}: `);
             console.log('----------------------');
-            throw new Error(workerOrder.error.message);
+            throw new Error(materialTwoOrder.error.message);
         }
-        const workerBuyPrice = workerOrder.order.total;
-        console.log(`Bought some Workers for ${workerBuyPrice} credits, time to sell them on the moon!`);
+        const matTwoBuyPrice = materialTwoOrder.order.total;
+        console.log(`Bought some ${materialTwo} for ${matTwoBuyPrice} credits, time to sell them on the moon!`);
         
         // Send the ship to the nearest planet (in this case OE-PM since we're on OE-PM-TR)
         // To get more info on locations you can use the functions in the locations file 
@@ -123,26 +148,26 @@ async function theLoop(username, token, shipId){
 
         console.log(`Ship has liftoff, waiting ${primteToTritusFlightTime} seconds until touchdown`);
 
-        await sleep(primteToTritusFlightTime*1000);
+        await help.sleep(primteToTritusFlightTime*1000);
         // --------------------------------------------------------------------------------------------------------------------------
 
 
 
-        // STEP FOUR ------ SELL WORKERS AND REFUEL ---------------------------------------------------------------------------------
-        // Sell all of the METAL material on your ship for profit
-        const sellWorkers = await sellOrders.sellGoods(username, token, shipId, materialTypes.types.WORKERS, 45);
-        if(sellWorkers.error){
-            console.log('\nERROR SELLING WORKERS: ');
+        // STEP FOUR ------ SELL MATERIAL TWO AND REFUEL ----------------------------------------------------------------------------
+        // Sell all of the second material on your ship for profit
+        const sellMaterialTwo = await sellOrders.sellGoods(username, token, shipId, materialTwo, matTwoAmount);
+        if(sellMaterialTwo.error){
+            console.log(`\nERROR SELLING ${materialTwo}: `);
             console.log('---------------------');
             throw new Error(sellOrder.error.message);
         }
-        const workerSellPrice = sellWorkers.order.total;
-        const workerDifference = workerSellPrice-workerBuyPrice;
-        console.log(`Workers sold for ${workerSellPrice} credits!`);
-        if(workerDifference > 0){
-            console.log(`That's a profit of ${workerDifference} credits!`);
+        const matTwoSellPrice = sellMaterialTwo.order.total;
+        const matTwoDifference = matTwoSellPrice-matTwoBuyPrice;
+        console.log(`${materialTwo} sold for ${matTwoSellPrice} credits!`);
+        if(matTwoDifference > 0){
+            console.log(`That's a profit of ${matTwoDifference} credits!`);
         } else {
-            console.log(`That's a loss of ${workerDifference*-1} credits :( You may want to stop the loop to research the market`);
+            console.log(`That's a loss of ${matTwoDifference*-1} credits :( You may want to stop the loop to research the market`);
         }
 
         // Refuel again - this time we need to buy more because it takes more fuel to go from Prime to Tritus than Tritus to Prime
@@ -154,25 +179,18 @@ async function theLoop(username, token, shipId){
         }
         // Update the player on their credits and stop the loop if it's no longer profitable to run
         console.log(`Ship refueled. You now have ${refuelTwo.credits} credits!`);
-        if(metalDifference + workerDifference > 0){
-            console.log(`Thats a profit of ${metalDifference+workerDifference}. Good Work!`);
+        if(matOneDifference + matTwoDifference > 0){
+            console.log(`Thats a profit of ${matOneDifference+matTwoDifference}. Good Work!`);
         } else {
-            console.log(`That's a loss of ${(metalDifference+workerDifference)*-1}. Let's stop the loop to prevent further loss.`);
+            console.log(`That's a loss of ${(matOneDifference+matTwoDifference)*-1}. Let's stop the loop to prevent further loss.`);
             throw new Error(`Automation Loop is taking losses. Modify the loop to be profitable!`);
         }
         console.log(`Getting ready to start the next loop.\n\n`)
-        await sleep(delayTimer);
+        await help.sleep(delayTimer);
         // RESTART THE LOOP ----------------------------------------------------------------------------------------------------------
     }
 }
 
-/**
- * Pause the script for a number of milliseconds (seconds * 1000)
- * @param {Number} ms The time in milliseconds we want the script to pause for
- * @returns {Promise} returning a promise allows us to pause using the await keyword
- */
- function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
+
 
 exports.theLoop = theLoop;
