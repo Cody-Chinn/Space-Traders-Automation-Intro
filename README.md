@@ -29,6 +29,13 @@ I've added comments throughout to help even the newest of programmers try to ana
     - This folder also contains enumerations of commonly used Strings like planet names and material types.
     - To really optimize a loop, try to run each function to get a feel for the platform and how to play the game.
 
+# My loops running... so what now?
+Now it's time to learn the ins and outs of the market and how to modify the loop to work more efficiently. 
+What's buying low and selling high? 
+How would you change the loop to get market data and maximize profit? (hint: most people send ships to each planet as probes)
+Is there any simple change that can be made to the loop or preflight to make sure you're not wasting cargo space? (Do yo ureally need that much fuel at the beginning?)
+Learn how to teapot your ships! (or don't but cool people do)
+
 # Todo:
 ## Start Script changes
 - [x] Add error checking for each call
@@ -45,7 +52,7 @@ I've added comments throughout to help even the newest of programmers try to ana
 ## Repo needs
 - [x] Description of how the folder structure works
 - [x] Multiple prompts returning null?
-- [ ] Configurable planets in the loop and preflight
+- [x] Configurable planets in the loop and preflight
 - [x] Sleep function needs a home
 - [x] Better comments in existing user script
 - [x] Break up repeating functionalities?

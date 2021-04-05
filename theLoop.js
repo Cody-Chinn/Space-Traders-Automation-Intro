@@ -26,11 +26,15 @@ async function theLoop(username, token, shipId){
     const delayTimer = 1000;
     await help.sleep(delayTimer);
 
-    // Make sure the ship is capable of running the loop before we try to start the loop
+    // This section can be commented out once you start making your own loops that don't start on the moon
     const loopShip = await ships.getShipInfoById(username, token, shipId);
 
-    // This section can be commented out once you start making your own loops that don't start on the moon
-    const readyShip = await prep.preflightCheck(username, token, loopShip);
+    // Configure locations for the loop
+    const locationOne = systems.OE.PMTR;
+    const locationTwo = systems.OE.PM;
+
+    // Make sure the ship is capable of running the loop before we try to start the loop
+    const readyShip = await prep.preflightCheck(username, token, loopShip, locationOne);
     if(!readyShip){
         console.log(`The ship with ID ${shipId}, failed pre flight checks. 2 things are needed to make sure the ship is ready for the loop`);
         console.log(`1.) Ship needs to be on the moon.`);
@@ -52,13 +56,13 @@ async function theLoop(username, token, shipId){
     const preppedShip = await ships.getShipInfoById(username, token, shipId);
 
     // Calculate how much of material one and two to buy
-    const matOneSize = await help.getMaterialSize(token, systems.OE.PMTR, materialOne);
+    const matOneSize = await help.getMaterialSize(token, locationOne, materialOne);
     const matOneAmount = Math.floor(preppedShip.ship.spaceAvailable / matOneSize);
 
     console.log('\n\nBEGINNING AUTOMATION LOOP!');
     while(1){
         await help.sleep(delayTimer);
-        // STEP ONE ----- BUY FIRST MATERIAL AND FLY TO TRITUS -----------------------------------------------------------------------
+        // STEP ONE ----- BUY FIRST MATERIAL AND FLY TO SECOND LOCATION ------------------------------------------------------------------
         // Buy the first material so we can sell it on another planet, when buying/selling in this loop try to use 
         // the materialTypes.js import. It makes life a lot easier by giving you the options of things to buy
         const orderMaterialOne = await purchaseOrder.placePurchaseOrder(username, token, shipId, materialOne, matOneAmount);
@@ -69,22 +73,22 @@ async function theLoop(username, token, shipId){
         }
         const buyMatOnePrice = orderMaterialOne.order.total;
         console.log(`Bought some ${materialOne} for ${buyMatOnePrice} credits, let\'s go sell it on Prime for profit!`);
-        // Send the ship to the nearest planet (in this case OE-PM since we're on OE-PM-TR)
+        // Send the ship to the location two configured at the top of the file
         // To get more info on locations you can use the functions in the locations file 
-        const tritusToPrime = await flightPlans.submitNewFlightPlan(username, token, shipId, systems.OE.PM);
-        if(tritusToPrime.error){
+        const oneToTwo = await flightPlans.submitNewFlightPlan(username, token, shipId, locationTwo);
+        if(oneToTwo.error){
             console.log('\nERROR FLYING FROM TRITUS TO PRIME: ');
             console.log('-----------------------------------');
-            throw new Error(tritusToPrime.error.message);
+            throw new Error(oneToTwo.error.message);
         }
         // It's better to grab the flight time of a flight plan then multiply by 1000
         // to convert from milliseconds. This makes the script less vulnerable to flight
         // time changes on updates from the SpaceTraders API.
-        const tritusToPrimeFlighTime = tritusToPrime.flightPlan.timeRemainingInSeconds;
+        const oneToTwoFlighTime = oneToTwo.flightPlan.timeRemainingInSeconds;
 
-        console.log(`Ship has liftoff, waiting ${tritusToPrimeFlighTime} seconds until touchdown`);
+        console.log(`Ship has liftoff, waiting ${oneToTwoFlighTime} seconds until touchdown`);
 
-        await help.sleep(tritusToPrimeFlighTime*1000);
+        await help.sleep(oneToTwoFlighTime*1000);
         // --------------------------------------------------------------------------------------------------------------------------
 
 
@@ -121,9 +125,9 @@ async function theLoop(username, token, shipId){
 
 
 
-        // STEP THREE ----- BUY SECOND MATERIAL AND FLY BACK TO THE MOON ------------------------------------------------------------
+        // STEP THREE ----- BUY SECOND MATERIAL AND FLY BACK TO LOCATION ONE --------------------------------------------------------
         // Buy second material so we can sell it on another planet
-        const matTwoSize = await help.getMaterialSize(token, systems.OE.PM, materialTwo);
+        const matTwoSize = await help.getMaterialSize(token, locationTwo, materialTwo);
         const matTwoAmount = Math.floor(preppedShip.ship.spaceAvailable / matTwoSize);
         await help.sleep(delayTimer);
 
@@ -138,18 +142,18 @@ async function theLoop(username, token, shipId){
         
         // Send the ship to the nearest planet (in this case OE-PM since we're on OE-PM-TR)
         // To get more info on locations you can use the functions in the locations file 
-        const primeToTritus = await flightPlans.submitNewFlightPlan(username, token, shipId, systems.OE.PMTR);
-        if(primeToTritus.error){
+        const twoToOne = await flightPlans.submitNewFlightPlan(username, token, shipId, locationOne);
+        if(twoToOne.error){
             console.log('\nERROR FLYING FROM PRIME TO TRITUS: ');
             console.log('-----------------------------------');
-            throw new Error(primeToTritus.error.message);
+            throw new Error(twoToOne.error.message);
         }
         // Still need to make sure we using retrieved flight times, not hardcoded numbers
-        const primteToTritusFlightTime = primeToTritus.flightPlan.timeRemainingInSeconds;
+        const twoToOneFlightTime = twoToOne.flightPlan.timeRemainingInSeconds;
 
-        console.log(`Ship has liftoff, waiting ${primteToTritusFlightTime} seconds until touchdown`);
+        console.log(`Ship has liftoff, waiting ${twoToOneFlightTime} seconds until touchdown`);
 
-        await help.sleep(primteToTritusFlightTime*1000);
+        await help.sleep(twoToOneFlightTime*1000);
         // --------------------------------------------------------------------------------------------------------------------------
 
 
