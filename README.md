@@ -12,17 +12,21 @@ Space traders is a backend to a trading game in space. The front end was intenti
  - Make sure you have [Node JS](https://nodejs.org/en/download/) installed and then run ```npm install``` from your cmd line or terminal
     - tip for VS Code users: the keybind commands ``` control + ` ``` to open the terminal
  - Once all of the packages are installed, run ```npm start```
- - That's it! Type in a username and let the automation do it's work! 😃
+ - That's it! Follow the prompts to start your first automation! 😃
 
 ## How to use the repo
 I've added comments throughout to help even the newest of programmers try to analyze how this program works but I'll start at the top.
-- At the top level we have the index, readme, and package.json files. 
+- At the top level we have the prompt scripts, readme, and package.json files. 
     - The package.json files are what tell npm what to download when running ```npm install``` and what file to run when running ```npm start```. There arent many in this project, but each package has its importance to keep the program running. I highly advise against editing these files manually.
-    - The index file is where the magic happens. When running ```npm start``` node will run this file which kicks off the automation. Any editing that needs to be done to the loop or the ships needs to happen here.
-    - Then of course there's the readme, license and node_modules folder which should be ignored during development.
+    - The index file is the entry point to the process. When running ```npm start``` node will automatically run this file for you.
+    - The newAccount and existingAccount files are scripts that prompt the user for a username, password and ship to use for looping.
+    - The loop is where you'll want to do most of your editing. This is the loop of events for your ship to fly though.
+        - You can configure what to buy sell at the top of this file where you see ```js materialOne = ...``` and further down where you see ```js materialTwo =...```
+    - Then there's the readme, license and node_modules folder which should be ignored during development.
 - The API folder
     - Each folder represents a section of the API found at [https://api.spacetraders.io/](https://api.spacetraders.io/) and each function represents a different call to make to the API.
     - To use any of these functions, use ```js var *varName* = require('./Api/*filename*.js)```, then access the functions with ```js *varName*.*functionName*(*parameters*);```]
+    - This folder also contains enumerations of commonly used Strings like planet names and material types.
     - To really optimize a loop, try to run each function to get a feel for the platform and how to play the game.
 
 # Todo:
@@ -39,7 +43,7 @@ I've added comments throughout to help even the newest of programmers try to ana
     - [x] User with multiple ships
 
 ## Repo needs
-- [ ] Description of how the folder structure works
+- [x] Description of how the folder structure works
 - [ ] Multiple prompts returning null?
 - [x] Sleep function needs a home
 - [x] Better comments in existing user script
