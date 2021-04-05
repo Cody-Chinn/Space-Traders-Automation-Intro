@@ -87,7 +87,11 @@ async function selectShip(playerInfo){
         console.log(`Looks like we have some options so we'll leave that up to you.`);
         console.log(`We've found ${shipList.length} ships in your fleet and need to know which one you want to send to OE-PM-TR to start the automation loop.\n`);
         shipList.forEach((ship, ndx) => {
-            console.log(`Ship #${ndx+1}: Currently on ${ship.location}. ID: ${ship.id}`);
+            if(ship.location == undefined){
+                console.log(`Ship #${ndx+1}: Currently in flight. ID: ${ship.id}`);
+            } else {
+                console.log(`Ship #${ndx+1}: Currently on ${ship.location}. ID: ${ship.id}`);
+            }
         });
 
         console.log(`This ship will be emptied of all it's contents to make the loop work.\n`);

@@ -1,5 +1,5 @@
 const locations = require('./Api/locations.js');
-const materials = require('./Api/materialTypes.js');
+const {materials} = require('./Api/materialTypes.js');
 const flights = require('./Api/flightPlans.js');
 const purchase = require('./Api/purchaseOrders.js');
 const sell = require('./Api/sellOrders.js');
@@ -19,7 +19,28 @@ const delayTimer = 1000;
  * @param {String} startingLocation The planet prep the ship for
  * @return {Boolean} whether or not the ship passed preflight check
  */
- async function preflightCheck(username, token, ship, startingLocation){
+ async function preflightCheck(username, token, shipId, startingLocation){
+
+    // get the most up-to-date info on the ship
+    const ship = await ships.getShipInfoById(username, token, shipId);
+    if(ship.error){
+        console.log(`ERROR GETTING SHIP DATA IN  PREFLIGHT PREP`);
+        console.log(`------------------------------------------`);
+        throw new Error(ship.error);
+    }
+
+    // if the ship is in flight we'll need to wait for it to land
+    if(ship.ship.location == undefined){
+        const flightTimeRemaining = await flights.getFlightPlanById(username, token, ship.ship.flightPlanId);
+        if(flightTimeRemaining.error){
+            console.log(`ERROR GETTING FLIGHT INFORMATION FROM SHIP IN FLIGHT DURING PREFLIGHT`);
+            console.log(`---------------------------------------------------------------------`);
+            throw new Error(flightTimeRemaining.error);
+        }
+        console.log(`Ship is in flight, waiting ${flightTimeRemaining.flightPlan.timeRemainingInSeconds} seconds for the ship to land`);
+        ship.ship.location = flightTimeRemaining.flightPlan.destination;
+        await help.sleep(flightTimeRemaining.flightPlan.timeRemainingInSeconds*1001);
+    }
 
     console.log('\n\nRunning pre-flight checks!');
     console.log('Clearing out space in the ship...');
@@ -33,7 +54,7 @@ const delayTimer = 1000;
     if(ship.ship.location === startingLocation){
         console.log(`Ship is already on the ${startingLocation}. Preflight location test: PASS`);
     } else {
-        const travelTime = await sendToStart(username, token, ship, startingLocation);
+        const travelTime = await sendToStart(username, token, ship.ship.id, startingLocation);
         await help.sleep(travelTime*1000);
         console.log(`Ship is on ${startingLocation}. Preflight location test: PASS`);
     }  
@@ -53,7 +74,7 @@ const delayTimer = 1000;
         console.log(`Fuel is at ${fuelAmount}. Preflight fuel test: PASS`);
     } else {
         const neededFuel = 10-fuelAmount;
-        const buyFuel = await purchase.placePurchaseOrder(username, token, ship.ship.id, materials.types.FUEL, neededFuel);
+        const buyFuel = await purchase.placePurchaseOrder(username, token, ship.ship.id, materials.FUEL, neededFuel);
         if(buyFuel.error){
             console.log(`Couldn't buy fuel to send the ship to the ${startingLocation} in preflight check`);
             throw new Error(buyFuel.error.message);
@@ -70,23 +91,27 @@ const delayTimer = 1000;
  * @param {String} username The players username
  * @param {String} token The token associated with the players username
  * @param {Object} ship The ship retrieved from the getShipById endpoint
+ * @param {String} startLoc The starting planet symbol for the loop
  * @returns {Number} Flight time in seconds to the starting planet
  */
-async function sendToStart(username, token, ship, startLoc){
+async function sendToStart(username, token, shipId, startLoc){
     await help.sleep(delayTimer);
     const startLocInfo = await locations.getLocationInfo(token, startLoc);
-    const startLocDistance = await help.calcDistance(ship.ship.x, ship.ship.y, startLocInfo.location.x, startLocInfo.location.y);
+    const updatedShip = await ships.getShipInfoById(username, token, shipId);
+    await help.sleep(delayTimer);
+
+    const startLocDistance = await help.calcDistance(updatedShip.ship.x, updatedShip.ship.y, startLocInfo.location.x, startLocInfo.location.y);
     
     // Ship fuel amount should be at 0, so buying fuel to get to the starting location shouldn't cause problems
-    // We also waant to buy just a little more than the distance to make sure we get there without problems
-    const buyFuel = await purchase.placePurchaseOrder(username, token, ship.ship.id, materials.types.FUEL, startLocDistance+1);
+    // We also want to buy just a little more than the distance to make sure we get there without problems
+    const buyFuel = await purchase.placePurchaseOrder(username, token, updatedShip.ship.id, materials.FUEL, startLocDistance);
     if(buyFuel.error){
-        console.log(`Couldn't buy fuel to send the ship to the first location in preflight check`);
-        throw new Error(buyFuel.error.message);
+        console.log(buyFuel.error);
+        throw new Error(`Couldn't buy fuel to send the ship to the first location in preflight check`)
     }
 
     await help.sleep(delayTimer);
-    const flyToStart = await flights.submitNewFlightPlan(username, token, ship.ship.id, startLoc);
+    const flyToStart = await flights.submitNewFlightPlan(username, token, shipId, startLoc);
     if(flyToStart.error){
         console.log(`Could not send the ship to ${startingLocation} in preflight check :/ `);
         throw new Error(flyToStart.error.message)

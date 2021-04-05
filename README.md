@@ -51,7 +51,7 @@ Learn how to teapot your ships! (or don't but cool people do)
     - [x] User with multiple ships
 
 ## Repo needs
-- [ ] Undefined ships in flight
+- [x] Undefined ships in flight
 - [x] Description of how the folder structure works
 - [x] Multiple prompts returning null?
 - [x] Configurable planets in the loop and preflight

@@ -26,15 +26,12 @@ async function theLoop(username, token, shipId){
     const delayTimer = 1000;
     await help.sleep(delayTimer);
 
-    // This section can be commented out once you start making your own loops that don't start on the moon
-    const loopShip = await ships.getShipInfoById(username, token, shipId);
-
     // Configure locations for the loop
     const locationOne = systems.OE.PMTR;
     const locationTwo = systems.OE.PM;
 
     // Make sure the ship is capable of running the loop before we try to start the loop
-    const readyShip = await prep.preflightCheck(username, token, loopShip, locationOne);
+    const readyShip = await prep.preflightCheck(username, token, shipId, locationOne);
     if(!readyShip){
         console.log(`The ship with ID ${shipId}, failed pre flight checks. 2 things are needed to make sure the ship is ready for the loop`);
         console.log(`1.) Ship needs to be on the moon.`);

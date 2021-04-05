@@ -11,8 +11,8 @@ const {materials} = require('./Api/materialTypes.js');
 const help = require('./helpers.js');
 const { placePurchaseOrder } = require('./Api/purchaseOrders.js');
 
-const username = 'SpaceScorpion';
-const token = '424e60fb-4463-43f8-bcb1-45caac00503c';
+const username = 'TestScorpion';
+const token = '2520618b-e464-4a28-91f7-8ef5e6f50017';
 
 async function preflightCheck(){
     const ship = await ships.getShipInfoById(username, token,'ckmwqlurt6791031cs6nrbunn5i');
@@ -57,4 +57,4 @@ async function getSingleShip(){
     const ship = await ships.getShipInfoById(username, token, 'ckn4mp5s910736221ds6cyn6jmtg');
     console.log(ship);
 }
-getSingleShip();
+// getSingleShip();
