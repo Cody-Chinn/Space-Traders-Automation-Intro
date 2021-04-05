@@ -44,10 +44,15 @@ I've added comments throughout to help even the newest of programmers try to ana
 
 # My loops running... so what now?
 Now it's time to learn the ins and outs of the market and how to modify the loop to work more efficiently. 
+
 What's buying low and selling high? 
+
 What happens if you open 2 terminals and try to run ships at the same time? How would you turn this into a one terminal operation? (hint: semaphores are an option for limiting calls)
+
 How would you change the loop to get market data and maximize profit? (hint: most people send ships to each planet as probes)
-Is there any simple change that can be made to the loop or preflight to make sure you're not wasting cargo space? (Do yo ureally need that much fuel at the beginning?)
+
+Is there any simple change that can be made to the loop or preflight to make sure you're not wasting cargo space? (Do you really need that much fuel at the beginning?)
+
 Learn how to teapot your ships! (or don't but cool people do)
 
 # Todo:
