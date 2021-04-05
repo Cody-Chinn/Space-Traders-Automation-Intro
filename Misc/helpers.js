@@ -1,4 +1,4 @@
-const market = require('./Api/marketplace.js');
+const market = require('../Api/marketplace.js');
 
 /**
  * Gets the volumePerUnit of a desired material

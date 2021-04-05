@@ -1,11 +1,11 @@
-const ships = require('./Api/ships');
-const flightPlans = require('./Api/flightPlans.js');
-const purchaseOrder = require('./Api/purchaseOrders.js');
-const sellOrders = require('./Api/sellOrders.js');
+const ships = require('../Api/ships');
+const flightPlans = require('../Api/flightPlans.js');
+const purchaseOrder = require('../Api/purchaseOrders.js');
+const sellOrders = require('../Api/sellOrders.js');
 const prep = require('./preflightPrep');
-const help = require('./helpers.js');
-const {systems} = require('./Api/locationNames.js');
-const {materials} = require('./Api/materialTypes.js');
+const help = require('../Misc/helpers.js');
+const {systems} = require('../Api/locationNames.js');
+const {materials} = require('../Api/materialTypes.js');
 
 /**
  * The meat and potatoes function. All editing should be done here to optimize credit flow.

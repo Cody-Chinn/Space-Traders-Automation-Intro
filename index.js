@@ -1,7 +1,7 @@
 const prompt = require('prompt-sync')({sigint: true});
-const newAccount = require('./newAccount.js');
-const existingAccount = require('./existingAccount.js');
-const loop = require('./theLoop.js');
+const newAccount = require('./Start Scripts/newAccount.js');
+const existingAccount = require('./Start Scripts/existingAccount.js');
+const loop = require('./Start Scripts/theLoop.js');
 
 /*******************************************************************************
  * This kicks off the player creation and login. This file should be left alone.

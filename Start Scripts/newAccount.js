@@ -1,11 +1,11 @@
 const prompt = require('prompt-sync')({sigint: true});
-const loans = require('./Api/loans.js');
-const purchaseOrder = require('./Api/purchaseOrders.js');
-const ships = require('./Api/ships.js');
-const users = require('./Api/users.js');
-const {materials} = require('./Api/materialTypes.js');
-const {systems} = require('./Api/locationNames.js')
-const help = require('./helpers.js');
+const loans = require('../Api/loans.js');
+const purchaseOrder = require('../Api/purchaseOrders.js');
+const ships = require('../Api/ships.js');
+const users = require('../Api/users.js');
+const {materials} = require('../Api/materialTypes.js');
+const {systems} = require('../Api/locationNames.js')
+const help = require('../Misc/helpers.js');
 
 /************************************************************************
  * Spins up an account for a brand new user
@@ -39,7 +39,7 @@ async function accountCreator(){
         return;
     }
 
-    console.log(`Loan received! Here's the ID, you'll need that to pay it back --> ${loan.user.loans[0].id}`)
+    console.log(`\n\nLoan received! Here's the ID, you'll need that to pay it back --> ${loan.user.loans[0].id}`)
     await help.sleep(1500);
 
 

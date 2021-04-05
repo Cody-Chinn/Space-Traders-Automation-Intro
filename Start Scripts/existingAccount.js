@@ -1,8 +1,8 @@
 const prompt = require('prompt-sync')({sigint: true});
-const users = require('./Api/users.js');
-const ships = require('./Api/ships.js');
-const loans = require('./Api/loans.js');
-const {systems} = require('./Api/locationNames.js');
+const users = require('../Api/users.js');
+const ships = require('../Api/ships.js');
+const loans = require('../Api/loans.js');
+const {systems} = require('../Api/locationNames.js');
 
 /**
  * Retrieve the 3 things that are absolutely needed to run the loop
@@ -66,7 +66,11 @@ async function selectShip(playerInfo){
         return await tryBuyShip(playerInfo);
     // Part 2: The user only has 1 ship. Can we use it?
     } else if(shipList.length == 1){
-        console.log(`You only have one ship located at ${shipList[0].location}`);
+        if(shipList[0].location == undefined){
+            console.log(`You only have on ship and it's currently in flight`);
+        }else{
+            console.log(`You only have one ship located at ${shipList[0].location}`);
+        }
         console.log(`This ship will be emptied of all it's contents to make the loop work.`);
         const permissionToFly = prompt('Is it ok to use this ship for automation?(Y/N) ');
         if(permissionToFly == 'y' || permissionToFly == 'Y' ||
@@ -74,7 +78,7 @@ async function selectShip(playerInfo){
             return shipList[0].id;
         } else {
             // The user didn't want to use that ship, try to buy one
-            const buyShipAnswer = prompt('Can we try to purchase a ship on the moon for you?(Y/N)');
+            const buyShipAnswer = prompt('Can we try to purchase a ship on the moon for you?(Y/N) ');
             if(buyShipAnswer == 'y' || buyShipAnswer == 'Y' ||
                 buyShipAnswer == 'yes' || buyShipAnswer == 'Yes'){
                 return await tryBuyShip(playerInfo);
@@ -105,7 +109,7 @@ async function selectShip(playerInfo){
  * @returns {String} The id of the selected ship
  */
 async function getMultiShipPrompt(playerInfo){
-    console.log(`Which ship number do you want to use for the loop starting at OE-PM-TR?`)
+    console.log(`Which ship number do you want to use for the loop?`)
     const selection = prompt(`You can select a number or use B for buy. `);
 
     if(selection == 'B' || selection == 'b' ||
@@ -116,7 +120,7 @@ async function getMultiShipPrompt(playerInfo){
         return playerInfo.user.ships[selection-1].id;
     } else {
         console.log(`I'm not seeing that here. Try a different one.`);
-        getMultiShipPrompt(playerInfo);
+        return getMultiShipPrompt(playerInfo);
     }
 }
 
@@ -161,8 +165,15 @@ async function tryBuyShip(playerInfo){
         console.log('---------------------------------------');
         throw new Error(newShipId.error);
     }
-    console.log(`Just bought a shiny new Jackshaw on the moon! We'll use this bad boy to start making big bucks!`)
-    return newShip.user.ships[0].id;
+
+    newShip.user.ships.forEach(ship => {
+        if(!(ship.id in playerInfo.user.ships)){
+            console.log(`Just bought a shiny new Jackshaw on the moon! We'll use this bad boy to start making big bucks!`);
+            return ship.id;
+        }
+    })
+    
+    throw new Error(`Couldn't find the ID for the new ship`);
 }
 
 exports.retrievePlayerData = retrievePlayerData;

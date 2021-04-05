@@ -5,11 +5,11 @@
  * ships or loans
  */
 
-const preflight = require('./preflightPrep.js');
-const ships = require('./Api/ships.js');
-const {materials} = require('./Api/materialTypes.js');
+const preflight = require('../Start Scripts/preflightPrep.js');
+const ships = require('../Api/ships.js');
+const {materials} = require('../Api/materialTypes.js');
 const help = require('./helpers.js');
-const { placePurchaseOrder } = require('./Api/purchaseOrders.js');
+const { placePurchaseOrder } = require('../Api/purchaseOrders.js');
 
 const username = 'TestScorpion';
 const token = '2520618b-e464-4a28-91f7-8ef5e6f50017';

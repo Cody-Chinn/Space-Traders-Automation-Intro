@@ -1,10 +1,10 @@
-const locations = require('./Api/locations.js');
-const {materials} = require('./Api/materialTypes.js');
-const flights = require('./Api/flightPlans.js');
-const purchase = require('./Api/purchaseOrders.js');
-const sell = require('./Api/sellOrders.js');
-const ships = require('./API/ships.js');
-const help = require('./helpers.js');
+const locations = require('../Api/locations.js');
+const {materials} = require('../Api/materialTypes.js');
+const flights = require('../Api/flightPlans.js');
+const purchase = require('../Api/purchaseOrders.js');
+const sell = require('../Api/sellOrders.js');
+const ships = require('../API/ships.js');
+const help = require('../Misc/helpers.js');
 
 const delayTimer = 1000;
 /**
@@ -140,7 +140,7 @@ async function emptyShip(username, token, shipId){
             const trash = await ships.jettisonCargo(username, token, shipId, shipData.ship.cargo[i].good, shipData.ship.cargo[i].quantity);
             if(trash.error){
                 console.log(`There was an issue emptying the ship in the preflight check`);
-                throw new Error(jettison.error.message);
+                throw new Error(trash.error.message);
             } else {
                 console.log(`Succesfully jettisoned ${shipData.ship.cargo[i].good}!`);
             }
