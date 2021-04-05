@@ -3,7 +3,7 @@ const {materials} = require('../Api/materialTypes.js');
 const flights = require('../Api/flightPlans.js');
 const purchase = require('../Api/purchaseOrders.js');
 const sell = require('../Api/sellOrders.js');
-const ships = require('../API/ships.js');
+const ships = require('../Api/ships.js');
 const help = require('../Misc/helpers.js');
 
 const delayTimer = 1000;
