@@ -24,6 +24,23 @@ async function getMaterialSize(token, symbol, material){
 }
 
 /**
+ * Using the Distance formula we can calculate the distance 
+ * between any 2 points in 2D space. 
+ * Learn more about calculations here 
+ * https://wgvu.pbslearningmedia.org/resource/mgbh.math.g.pythag/calculating-distance-using-the-pythagorean-theorem/
+ * 
+ * @param {Number} xCoord1 The x position of the first location
+ * @param {Number} yCoord1 The y position of the first location
+ * @param {Number} xCoord2 The x position of the second location
+ * @param {Number} yCoord2 The y position of the second location
+ * @returns {Number} Distance between the two locations
+ */
+ async function calcDistance(xCoord1, yCoord1, xCoord2, yCoord2){
+  return Math.round(Math.sqrt(((xCoord2 - xCoord1) * (xCoord2 - xCoord1)) + ((yCoord2 - yCoord1) * (yCoord2 - yCoord1))));
+}
+
+
+/**
  * Pause the script for a number of milliseconds (seconds * 1000)
  * @param {Number} ms The time in milliseconds we want the script to pause for
  * @returns {Promise} returning a promise allows us to pause using the await keyword
@@ -33,4 +50,5 @@ async function getMaterialSize(token, symbol, material){
 }
 
 exports.getMaterialSize = getMaterialSize;
+exports.calcDistance = calcDistance;
 exports.sleep = sleep;

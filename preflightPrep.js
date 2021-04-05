@@ -73,7 +73,7 @@ const delayTimer = 1000;
 async function sendToMoon(username, token, ship){
     await help.sleep(delayTimer);
     const moon = await locations.getLocationInfo(token, locationNames.systems.OE.PMTR);
-    const moonDistance = await calcDistance(ship.ship.x, ship.ship.y, moon.location.x, moon.location.y);
+    const moonDistance = await help.calcDistance(ship.ship.x, ship.ship.y, moon.location.x, moon.location.y);
     
     // Ship fuel amount should be at 0, so buying fuel to get to the moon shouldn't cause problems
     // We also waant to buy just a little more than the distance to make sure we get there without problems
@@ -93,22 +93,6 @@ async function sendToMoon(username, token, ship){
     await help.sleep(flyToMoon.flightPlan.timeRemainingInSeconds);
 
     return flyToMoon.flightPlan.timeRemainingInSeconds;
-}
-
-/**
- * Using the Distance formula we can calculate the distance 
- * between any 2 points in 2D space. 
- * Learn more about calculations here 
- * https://wgvu.pbslearningmedia.org/resource/mgbh.math.g.pythag/calculating-distance-using-the-pythagorean-theorem/
- * 
- * @param {Number} xCoord1 The x position of the first location
- * @param {Number} yCoord1 The y position of the first location
- * @param {Number} xCoord2 The x position of the second location
- * @param {Number} yCoord2 The y position of the second location
- * @returns {Number} Distance between the two locations
- */
-async function calcDistance(xCoord1, yCoord1, xCoord2, yCoord2){
-    return Math.round(Math.sqrt(((xCoord2 - xCoord1) * (xCoord2 - xCoord1)) + ((yCoord2 - yCoord1) * (yCoord2 - yCoord1))));
 }
 
 /**
@@ -141,5 +125,4 @@ async function emptyShip(username, token, shipId){
 }
 
 exports.preflightCheck = preflightCheck;
-exports.calcDistance = calcDistance;
 exports.emptyShip = emptyShip;

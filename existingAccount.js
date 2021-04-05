@@ -33,14 +33,14 @@ async function retrievePlayerData(){
  */
 async function login(){
     // Request the username and token from the user
-    const playerName = prompt(`You looked familiar! What\'s your callsign cadet? `);
-    const playerToken = prompt(`${playerName}, of course! What's your token? `);
+    let playerName = prompt(`You looked familiar! What\'s your callsign cadet? `);
+    let playerToken = prompt(`${playerName}, of course! What's your token? `);
 
     // Send the data from the prompts to the API to verify the account
     const playerData = await users.getUserInfo(playerName, playerToken);
     if(playerData.error){
         console.log(`\nThat's not in the system... let's try that again`);
-        login();
+        return login();
     }
 
     // Add the token to the player data for ease of access

@@ -44,7 +44,7 @@ I've added comments throughout to help even the newest of programmers try to ana
 
 ## Repo needs
 - [x] Description of how the folder structure works
-- [ ] Multiple prompts returning null?
+- [x] Multiple prompts returning null?
 - [ ] Configurable planets in the loop and preflight
 - [x] Sleep function needs a home
 - [x] Better comments in existing user script
