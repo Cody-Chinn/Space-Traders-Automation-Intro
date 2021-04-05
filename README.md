@@ -42,7 +42,7 @@ I've added comments throughout to help even the newest of programmers try to ana
 - [ ] Description of how the folder structure works
 - [ ] Multiple prompts returning null?
 - [x] Sleep function needs a home
-- [ ] Better comments in existing user script
+- [x] Better comments in existing user script
 - [x] Break up repeating functionalities?
 - [x] ENUM for Material keys
 

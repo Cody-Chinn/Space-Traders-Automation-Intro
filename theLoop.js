@@ -5,6 +5,7 @@ const sellOrders = require('./Api/sellOrders.js');
 const materialTypes = require('./Api/materialTypes.js');
 const prep = require('./preflightPrep');
 const help = require('./helpers.js');
+const { systems } = require('./Api/locationNames.js');
 
 /**
  * The meat and potatoes function. All editing should be done here to optimize credit flow.
@@ -51,7 +52,7 @@ async function theLoop(username, token, shipId){
     const preppedShip = await ships.getShipInfoById(username, token, shipId);
 
     // Calculate how much of material one and two to buy
-    const matOneSize = await help.getMaterialSize(token, 'OE-PM-TR', materialOne);
+    const matOneSize = await help.getMaterialSize(token, systems.OE.PMTR, materialOne);
     const matOneAmount = Math.floor(preppedShip.ship.spaceAvailable / matOneSize);
 
     console.log('\n\nBEGINNING AUTOMATION LOOP!');
@@ -70,7 +71,7 @@ async function theLoop(username, token, shipId){
         console.log(`Bought some ${materialOne} for ${buyMatOnePrice} credits, let\'s go sell it on Prime for profit!`);
         // Send the ship to the nearest planet (in this case OE-PM since we're on OE-PM-TR)
         // To get more info on locations you can use the functions in the locations file 
-        const tritusToPrime = await flightPlans.submitNewFlightPlan(username, token, shipId, 'OE-PM');
+        const tritusToPrime = await flightPlans.submitNewFlightPlan(username, token, shipId, systems.OE.PM);
         if(tritusToPrime.error){
             console.log('\nERROR FLYING FROM TRITUS TO PRIME: ');
             console.log('-----------------------------------');
@@ -122,7 +123,7 @@ async function theLoop(username, token, shipId){
 
         // STEP THREE ----- BUY SECOND MATERIAL AND FLY BACK TO THE MOON ------------------------------------------------------------
         // Buy second material so we can sell it on another planet
-        const matTwoSize = await help.getMaterialSize(token, 'OE-PM', materialTwo);
+        const matTwoSize = await help.getMaterialSize(token, systems.OE.PM, materialTwo);
         const matTwoAmount = Math.floor(preppedShip.ship.spaceAvailable / matTwoSize);
         await help.sleep(delayTimer);
 
@@ -137,7 +138,7 @@ async function theLoop(username, token, shipId){
         
         // Send the ship to the nearest planet (in this case OE-PM since we're on OE-PM-TR)
         // To get more info on locations you can use the functions in the locations file 
-        const primeToTritus = await flightPlans.submitNewFlightPlan(username, token, shipId, 'OE-PM-TR');
+        const primeToTritus = await flightPlans.submitNewFlightPlan(username, token, shipId, systems.OE.PMTR);
         if(primeToTritus.error){
             console.log('\nERROR FLYING FROM PRIME TO TRITUS: ');
             console.log('-----------------------------------');

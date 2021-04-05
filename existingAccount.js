@@ -2,13 +2,15 @@ const prompt = require('prompt-sync')({sigint: true});
 const users = require('./Api/users.js');
 const ships = require('./Api/ships.js');
 const loans = require('./Api/loans.js');
-const preFlight = require('./preflightPrep.js');
-const flightPlans = require('./Api/flightPlans.js');
-const locations = require('./Api/locations.js');
-const purchase = require('./Api/purchaseOrders.js');
+const {systems} = require('./Api/locationNames.js');
 
 /**
- * Log the player in and request which ships (if any) to use
+ * Retrieve the 3 things that are absolutely needed to run the loop
+ * 1) Username
+ * 2) Token
+ * 3) Ship ID
+ * @returns {Object} Object to run the loop with the username, token and shipId 
+ *  of the ship that will be running the loop
  */
 async function retrievePlayerData(){
     const playerInfo = await login();
@@ -25,37 +27,44 @@ async function retrievePlayerData(){
     
 }
 
-/***********************************************************************************
- * Attempt to login to the players account. If it fails, try again
- * @returns {Object} The newly created accounts data
- ***********************************************************************************/
+/**
+ * Attempt to login to the players account with a prompt. If it fails, try again
+ * @returns {Object} The verified information of the of the user - username and token
+ */
 async function login(){
-    // Send the requested user callsign to the api to create an accoun
+    // Request the username and token from the user
     const playerName = prompt(`You looked familiar! What\'s your callsign cadet? `);
     const playerToken = prompt(`${playerName}, of course! What's your token? `);
 
+    // Send the data from the prompts to the API to verify the account
     const playerData = await users.getUserInfo(playerName, playerToken);
     if(playerData.error){
-        console.log(`That's not in the system... let's try that again`);
+        console.log(`\nThat's not in the system... let's try that again`);
         login();
     }
 
+    // Add the token to the player data for ease of access
     playerData.token = playerToken;
 
     return playerData;
 }
 
-/*****************************************************************************
- * 
- * @param {List<String>} shipList the list of ships the player currently owns
- ****************************************************************************/
+/**
+ * There's 3 scenarios to check for when selecting a ship from the user
+ * 1) No ships - buy one
+ * 2) 1 ship - is it ok to use it or should one be bought?
+ * 3) multiple ships - present the list of ships to the user and have them pick which one to use or buy one
+ * @param {Object} playerInfo Contains all data from the https://api.spacetraders.io/users/:username endpoint and the users token
+ * @returns {String} The ID of the ship to run the loop
+ */
 async function selectShip(playerInfo){
     const shipList = playerInfo.user.ships;
 
+    // Part 1: does the user even have a ship?
     if(shipList.length == 0){
         console.log(`No ships found. Let's get you in brand new hot rod.`);
-        const shipId = await tryBuyShip(playerInfo);
-        return shipId;
+        return await tryBuyShip(playerInfo);
+    // Part 2: The user only has 1 ship. Can we use it?
     } else if(shipList.length == 1){
         console.log(`You only have one ship located at ${shipList[0].location}`);
         console.log(`This ship will be emptied of all it's contents to make the loop work.`);
@@ -64,51 +73,67 @@ async function selectShip(playerInfo){
             permissionToFly == 'yes' || permissionToFly == 'Yes'){
             return shipList[0].id;
         } else {
+            // The user didn't want to use that ship, try to buy one
             const buyShipAnswer = prompt('Can we try to purchase a ship on the moon for you?(Y/N)');
             if(buyShipAnswer == 'y' || buyShipAnswer == 'Y' ||
                 buyShipAnswer == 'yes' || buyShipAnswer == 'Yes'){
-                const newShipId = await tryBuyShip(playerInfo);
-                return newShipId;
-            } 
-            
-            throw new Error(`We need a ship for the automation loop. Once you want to stop being difficult we can try this again.`);
+                return await tryBuyShip(playerInfo);
+            }
+
+            throw new Error(`The loop needs a ship but we're out of options. Try again with a different account or buy a ship for the loop`);
         }
     } else {
+        // Part 3: The user has multiple ships. Show them all of their ships or ask to buy one
         console.log(`Looks like we have some options so we'll leave that up to you.`);
-        console.log(`We've found ${shipList.length} ships in your fleet and need to know which one you want to send to OE-PM-TR to start the automation loop.`);
+        console.log(`We've found ${shipList.length} ships in your fleet and need to know which one you want to send to OE-PM-TR to start the automation loop.\n`);
         shipList.forEach((ship, ndx) => {
             console.log(`Ship #${ndx+1}: Currently on ${ship.location}. ID: ${ship.id}`);
         });
 
-        console.log(`This ship will be emptied of all it's contents to make the loop work.`);
-        const shipId = await getMultiShipPrompt(shipList);
-        return shipId;
+        console.log(`This ship will be emptied of all it's contents to make the loop work.\n`);
+        return await getMultiShipPrompt(playerInfo);
     }
 }
 
-async function getMultiShipPrompt(shipList){
-    const selection = prompt(`Which ship number do you want to use for the loop starting at OE-PM-TR? `);
+/**
+ * Prompt the user to pick a ship from their fleet to use or to buy a ship
+ * @param {Object} playerInfo Contains all data from the https://api.spacetraders.io/users/:username endpoint and the users token
+ * @returns {String} The id of the selected ship
+ */
+async function getMultiShipPrompt(playerInfo){
+    console.log(`Which ship number do you want to use for the loop starting at OE-PM-TR?`)
+    const selection = prompt(`You can select a number or use B for buy. `);
+
+    if(selection == 'B' || selection == 'b' ||
+        selection == 'Buy' || selection == 'buy'){
+            return await tryBuyShip(playerInfo);
     // Using -1 here to adjust for calling the ship list 1-5 instead of 0-4
-    if(shipList[selection-1]){
-        return shipList[selection-1].id;
+    } else if(playerInfo.user.ships[selection-1]){
+        return playerInfo.user.ships[selection-1].id;
     } else {
         console.log(`I'm not seeing that here. Try a different one.`);
-        getMultiShipPrompt(shipList);
+        getMultiShipPrompt(playerInfo);
     }
 }
 
+/**
+ * Try to buy a ship on Tritus (Primes moon)
+ * @param {Object} playerInfo Contains all data from the https://api.spacetraders.io/users/:username endpoint and the users token
+ * @returns {String} The id of a newly bought ship
+ */
 async function tryBuyShip(playerInfo){
-    // check playerinfo.user.loans for a length of 0, take out a loan if it is a length of 0
-    // if it's not and the user already has a loan, check the credits against the cost of a Jackshaw
-    // and ask the player if they can buy one. return the new ship id or null if they don't want to buy one
+    
+    // Get a list of ships that the user can buy
     const availableShips = await ships.getAvailableShips(playerInfo.token);
     let shipPrice;
     availableShips.ships.forEach(ship => {
         if(ship.type == "JW-MK-I"){
+            // set the ship price to the Jackshaw price on the moon
             shipPrice = ship.purchaseLocations[0].price;
         }
     });
-
+    
+    // check the players loan list for a length of 0, take out a loan if it is a length of 0 and they don't have credits to buy one
     if(playerInfo.user.loans.length == 0 && playerInfo.user.credits < shipPrice){
         console.log(`You can't afford a ship and you don't currently have loans. Let's get a loan taken out for you!`);
         const loan = await loans.requestNewLoan(playerInfo.user.username, playerInfo.token, 'STARTUP');
@@ -118,6 +143,7 @@ async function tryBuyShip(playerInfo){
             throw new Error(loan.error.message);
         }
         console.log(`Loan received! Here's the ID, you'll need that to pay it back --> ${loan.user.loans[0].id}`);
+    // check the credits against the cost of a Jackshaw
     } else if(playerInfo.user.credits < shipPrice){
         console.log(`Looks like you're a little short on cash. Unfortunately we can't start the trade loop without a ship on the moon.`);
         console.log(`You'll either need to make enough to buy another ship, or create a new account to start using the loop`);
@@ -125,7 +151,7 @@ async function tryBuyShip(playerInfo){
         throw new Error(`You'll either need to make enough to buy another ship, or create a new account to start using the loop. Exiting script`);
     }
 
-    const newShip = await ships.buyShip(playerInfo.user.username, playerInfo.token, 'OE-PM-TR', 'JW-MK-I');
+    const newShip = await ships.buyShip(playerInfo.user.username, playerInfo.token, systems.OE.PMTR, 'JW-MK-I');
     if(newShip.error){
         console.log('ERROR PURCHASING SHIP FOR EXISTING USER');
         console.log('---------------------------------------');
@@ -133,6 +159,6 @@ async function tryBuyShip(playerInfo){
     }
     console.log(`Just bought a shiny new Jackshaw on the moon! We'll use this bad boy to start making big bucks!`)
     return newShip.user.ships[0].id;
-
 }
+
 exports.retrievePlayerData = retrievePlayerData;
