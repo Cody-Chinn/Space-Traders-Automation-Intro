@@ -161,7 +161,7 @@ async function theLoop(username, token, shipId){
         if(sellMaterialTwo.error){
             console.log(`\nERROR SELLING ${materialTwo}: `);
             console.log('---------------------');
-            throw new Error(sellOrder.error.message);
+            throw new Error(sellMaterialTwo.error.message);
         }
         const matTwoSellPrice = sellMaterialTwo.order.total;
         const matTwoDifference = matTwoSellPrice-matTwoBuyPrice;
