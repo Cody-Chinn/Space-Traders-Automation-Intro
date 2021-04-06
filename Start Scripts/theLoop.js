@@ -94,7 +94,7 @@ async function theLoop(username, token, shipId){
         // Sell all of the first material on your ship for profit
         const sellMatOne = await sellOrders.sellGoods(username, token, shipId, materialOne, matOneAmount);  
         if(sellMatOne.error){
-            console.log(`\nERROR SELLING ${firstMaterial}: `);
+            console.log(`\nERROR SELLING ${materialOne}: `);
             console.log('---------------------');
             throw new Error(sellMatOne.error.message);
         }
