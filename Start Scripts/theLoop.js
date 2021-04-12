@@ -45,7 +45,7 @@ async function theLoop(username, token, shipId){
     // Material One will be bought on the first planet and sold on the second
     // Material Two will be bought on the second planet and sold on the first
     const materialOne = materials.METALS;
-    const materialTwo = materials.WORKERS;
+    const materialTwo = materials.DRONES;
 
     await help.sleep(delayTimer);
 
@@ -192,7 +192,5 @@ async function theLoop(username, token, shipId){
         // RESTART THE LOOP ----------------------------------------------------------------------------------------------------------
     }
 }
-
-
 
 exports.theLoop = theLoop;

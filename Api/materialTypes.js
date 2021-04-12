@@ -17,7 +17,7 @@ const materials = {
     SHIP_PARTS: 'SHIP_PARTS',
     SHIP_PLATING: 'SHIP_PLATING',
     TEXTILES: 'TEXTILES',
-    WORKERS: 'WORKERS',
+    DRONES: 'DRONES',
 }
 
 exports.materials = materials;
